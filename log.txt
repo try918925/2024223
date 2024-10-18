@@ -1,0 +1,373 @@
+2024-10-02 12:28:16,887 - LOGGER - INFO - This is an info message.
+2024-10-02 12:28:37,044 - LOGGER - INFO - This is an info message.
+2024-10-02 12:28:37,326 - LOGGER - INFO - This is an info message.
+2024-10-02 12:28:37,366 - LOGGER - INFO - This is an info message.
+2024-10-02 12:28:43,880 - LOGGER - INFO - This is an info message.
+2024-10-02 12:28:43,919 - LOGGER - INFO - This is an info message.
+2024-10-02 12:28:44,000 - LOGGER - INFO - This is an info message.
+2024-10-02 12:28:44,021 - LOGGER - INFO - This is an info message.
+2024-10-02 12:28:44,038 - LOGGER - INFO - This is an info message.
+2024-10-02 12:28:55,628 - LOGGER - INFO - top, :拼图的图片数量为:166
+2024-10-02 12:28:56,541 - LOGGER - INFO - top, :拼图的图片数量为:4
+2024-10-02 12:29:12,621 - LOGGER - INFO - top, :拼图的图片数量为:257
+2024-10-02 12:29:28,560 - LOGGER - INFO - top, :拼图的图片数量为:189
+2024-10-02 12:29:40,552 - LOGGER - INFO - top, :拼图的图片数量为:64
+2024-10-02 12:29:41,768 - LOGGER - INFO - top, :拼图的图片数量为:8
+2024-10-02 12:29:43,373 - LOGGER - INFO - top, :拼图的图片数量为:13
+2024-10-02 12:29:43,980 - LOGGER - INFO - top, :拼图的图片数量为:6
+2024-10-02 12:29:50,249 - LOGGER - INFO - top, :拼图的图片数量为:26
+2024-10-02 12:30:08,556 - LOGGER - INFO - top, :拼图的图片数量为:282
+2024-10-02 12:30:10,622 - LOGGER - INFO - top, :拼图的图片数量为:6
+2024-10-02 12:30:12,506 - LOGGER - INFO - top, :拼图的图片数量为:6
+2024-10-02 12:30:17,532 - LOGGER - INFO - top, :拼图的图片数量为:12
+2024-10-02 12:30:20,568 - LOGGER - INFO - top, :拼图的图片数量为:34
+2024-10-02 12:30:34,633 - LOGGER - INFO - top, :拼图的图片数量为:33
+2024-10-02 12:30:35,542 - LOGGER - INFO - top, :拼图的图片数量为:10
+2024-10-02 12:30:40,566 - LOGGER - INFO - top, :拼图的图片数量为:65
+2024-10-02 12:30:41,079 - LOGGER - INFO - top, :拼图的图片数量为:5
+2024-10-02 12:30:41,578 - LOGGER - INFO - top, :拼图的图片数量为:4
+2024-10-02 12:30:44,531 - LOGGER - INFO - top, :拼图的图片数量为:33
+2024-10-02 12:30:52,520 - LOGGER - INFO - top, :拼图的图片数量为:64
+2024-10-02 12:31:00,551 - LOGGER - INFO - top, :拼图的图片数量为:64
+2024-10-02 12:31:03,364 - LOGGER - INFO - top, :拼图的图片数量为:4
+2024-10-02 12:31:06,548 - LOGGER - INFO - top, :拼图的图片数量为:29
+2024-10-02 12:31:20,542 - LOGGER - INFO - top, :拼图的图片数量为:212
+2024-10-02 12:31:21,852 - LOGGER - INFO - top, :拼图的图片数量为:17
+2024-10-02 12:31:32,645 - LOGGER - INFO - top, :拼图的图片数量为:68
+2024-10-02 12:31:33,196 - LOGGER - INFO - top, :拼图的图片数量为:5
+2024-10-02 12:31:33,963 - LOGGER - INFO - top, :拼图的图片数量为:6
+2024-10-02 12:31:36,520 - LOGGER - INFO - left, :拼图的图片数量为:64
+2024-10-02 12:31:36,520 - LOGGER - INFO - top, :拼图的图片数量为:32
+2024-10-02 12:31:52,605 - LOGGER - INFO - top, :拼图的图片数量为:193
+2024-10-02 12:31:56,543 - LOGGER - INFO - top, :拼图的图片数量为:33
+2024-10-02 12:32:08,543 - LOGGER - INFO - top, :拼图的图片数量为:64
+2024-10-02 12:32:15,657 - LOGGER - INFO - left, :拼图的图片数量为:6
+2024-10-02 12:32:16,319 - LOGGER - INFO - left, :拼图的图片数量为:6
+2024-10-02 12:32:18,628 - LOGGER - INFO - top, :拼图的图片数量为:17
+2024-10-02 12:32:24,833 - LOGGER - INFO - left, :拼图的图片数量为:5
+2024-10-02 12:32:31,389 - LOGGER - INFO - left, :拼图的图片数量为:7
+2024-10-02 12:32:36,555 - LOGGER - INFO - top, :拼图的图片数量为:192
+2024-10-02 12:32:38,670 - LOGGER - INFO - top, :拼图的图片数量为:18
+2024-10-02 12:32:47,188 - LOGGER - INFO - top, :拼图的图片数量为:9
+2024-10-02 12:32:51,502 - LOGGER - INFO - left, :拼图的图片数量为:6
+2024-10-02 12:32:52,542 - LOGGER - INFO - top, :拼图的图片数量为:64
+2024-10-02 12:32:57,997 - LOGGER - INFO - top, :拼图的图片数量为:8
+2024-10-02 12:33:00,530 - LOGGER - INFO - top, :拼图的图片数量为:14
+2024-10-02 12:33:21,486 - LOGGER - INFO - top, :拼图的图片数量为:5
+2024-10-02 12:34:34,315 - LOGGER - INFO - top, :拼图的图片数量为:34
+2024-10-02 12:34:48,496 - LOGGER - INFO - top, :拼图的图片数量为:40
+2024-10-02 12:34:55,732 - LOGGER - INFO - top, :拼图的图片数量为:52
+2024-10-02 12:35:00,507 - LOGGER - INFO - top, :拼图的图片数量为:64
+2024-10-02 12:36:08,765 - LOGGER - INFO - top, :拼图的图片数量为:899
+2024-10-02 12:36:09,282 - LOGGER - INFO - top, :拼图的图片数量为:5
+2024-10-02 12:36:22,300 - LOGGER - INFO - top, :拼图的图片数量为:153
+2024-10-02 12:36:48,492 - LOGGER - INFO - top, :拼图的图片数量为:416
+2024-10-02 12:36:53,807 - LOGGER - INFO - top, :拼图的图片数量为:21
+2024-10-02 12:37:40,489 - LOGGER - INFO - left, :拼图的图片数量为:64
+2024-10-02 12:38:16,497 - LOGGER - INFO - top, :拼图的图片数量为:1147
+2024-10-02 12:38:20,532 - LOGGER - INFO - top, :拼图的图片数量为:44
+2024-10-02 12:38:32,533 - LOGGER - INFO - top, :拼图的图片数量为:64
+2024-10-02 12:39:14,564 - LOGGER - INFO - top, :拼图的图片数量为:25
+2024-10-02 12:39:16,501 - LOGGER - INFO - top, :拼图的图片数量为:27
+2024-10-02 12:39:23,863 - LOGGER - INFO - left, :拼图的图片数量为:54
+2024-10-02 12:39:38,060 - LOGGER - INFO - left, :拼图的图片数量为:14
+2024-10-02 12:39:41,468 - LOGGER - INFO - left, :拼图的图片数量为:37
+2024-10-02 12:39:56,482 - LOGGER - INFO - left, :拼图的图片数量为:123
+2024-10-02 12:41:16,452 - LOGGER - INFO - left, :拼图的图片数量为:256
+2024-10-02 12:41:30,413 - LOGGER - INFO - left, :拼图的图片数量为:154
+2024-10-02 12:41:31,755 - LOGGER - INFO - left, :拼图的图片数量为:9
+2024-10-02 12:41:36,471 - LOGGER - INFO - left, :拼图的图片数量为:44
+2024-10-02 12:41:44,492 - LOGGER - INFO - left, :拼图的图片数量为:64
+2024-10-02 12:41:51,826 - LOGGER - INFO - left, :拼图的图片数量为:53
+2024-10-02 12:41:56,490 - LOGGER - INFO - left, :拼图的图片数量为:64
+2024-10-02 12:42:12,464 - LOGGER - INFO - left, :拼图的图片数量为:64
+2024-10-02 12:42:56,953 - LOGGER - INFO - left, :拼图的图片数量为:6
+2024-10-02 12:42:59,718 - LOGGER - INFO - left, :拼图的图片数量为:30
+2024-10-02 12:43:00,445 - LOGGER - INFO - left, :拼图的图片数量为:9
+2024-10-02 12:44:16,481 - LOGGER - INFO - left, :拼图的图片数量为:61
+2024-10-02 12:44:32,565 - LOGGER - INFO - left, :拼图的图片数量为:193
+2024-10-02 12:44:33,444 - LOGGER - INFO - top, :拼图的图片数量为:14
+2024-10-02 12:44:36,085 - LOGGER - INFO - top, :拼图的图片数量为:12
+2024-10-02 12:44:52,442 - LOGGER - INFO - left, :拼图的图片数量为:297
+2024-10-02 12:45:00,466 - LOGGER - INFO - left, :拼图的图片数量为:64
+2024-10-02 12:45:12,431 - LOGGER - INFO - left, :拼图的图片数量为:64
+2024-10-02 12:45:24,429 - LOGGER - INFO - left, :拼图的图片数量为:64
+2024-10-02 12:45:44,424 - LOGGER - INFO - left, :拼图的图片数量为:64
+2024-10-02 12:45:55,863 - LOGGER - INFO - left, :拼图的图片数量为:55
+2024-10-02 12:46:02,857 - LOGGER - INFO - top, :拼图的图片数量为:37
+2024-10-02 12:46:03,741 - LOGGER - INFO - top, :拼图的图片数量为:5
+2024-10-02 12:46:07,567 - LOGGER - INFO - left, :拼图的图片数量为:12
+2024-10-02 12:46:08,443 - LOGGER - INFO - top, :拼图的图片数量为:71
+2024-10-02 12:46:28,419 - LOGGER - INFO - top, :拼图的图片数量为:67
+2024-10-02 12:46:29,422 - LOGGER - INFO - left, :拼图的图片数量为:16
+2024-10-02 12:46:44,476 - LOGGER - INFO - top, :拼图的图片数量为:64
+2024-10-02 12:46:51,196 - LOGGER - INFO - top, :拼图的图片数量为:18
+2024-10-02 12:46:58,982 - LOGGER - INFO - left, :拼图的图片数量为:9
+2024-10-02 12:47:08,417 - LOGGER - INFO - left, :拼图的图片数量为:128
+2024-10-02 12:47:12,453 - LOGGER - INFO - top, :拼图的图片数量为:336
+2024-10-02 12:47:16,421 - LOGGER - INFO - left, :拼图的图片数量为:64
+2024-10-02 12:47:24,573 - LOGGER - INFO - top, :拼图的图片数量为:36
+2024-10-02 12:47:28,448 - LOGGER - INFO - left, :拼图的图片数量为:129
+2024-10-02 12:47:36,849 - LOGGER - INFO - top, :拼图的图片数量为:31
+2024-10-02 12:47:37,175 - LOGGER - INFO - left, :拼图的图片数量为:8
+2024-10-02 12:47:40,151 - LOGGER - INFO - left, :拼图的图片数量为:8
+2024-10-02 12:47:44,424 - LOGGER - INFO - left, :拼图的图片数量为:64
+2024-10-02 12:48:11,684 - LOGGER - INFO - left, :拼图的图片数量为:50
+2024-10-02 12:48:12,427 - LOGGER - INFO - left, :拼图的图片数量为:7
+2024-10-02 12:48:18,425 - LOGGER - INFO - left, :拼图的图片数量为:32
+2024-10-02 12:48:19,697 - LOGGER - INFO - left, :拼图的图片数量为:10
+2024-10-02 12:48:36,408 - LOGGER - INFO - left, :拼图的图片数量为:262
+2024-10-02 12:48:48,402 - LOGGER - INFO - left, :拼图的图片数量为:128
+2024-10-02 12:48:49,867 - LOGGER - INFO - left, :拼图的图片数量为:5
+2024-10-02 12:48:51,956 - LOGGER - INFO - left, :拼图的图片数量为:7
+2024-10-02 12:49:02,514 - LOGGER - INFO - left, :拼图的图片数量为:27
+2024-10-02 12:49:12,630 - LOGGER - INFO - top, :拼图的图片数量为:75
+2024-10-02 12:49:42,255 - LOGGER - INFO - top, :拼图的图片数量为:15
+2024-10-02 12:49:42,797 - LOGGER - INFO - top, :拼图的图片数量为:4
+2024-10-02 12:49:43,407 - LOGGER - INFO - top, :拼图的图片数量为:5
+2024-10-02 12:50:02,191 - LOGGER - INFO - top, :拼图的图片数量为:27
+2024-10-02 12:50:03,780 - LOGGER - INFO - top, :拼图的图片数量为:8
+2024-10-02 12:50:22,073 - LOGGER - INFO - top, :拼图的图片数量为:25
+2024-10-02 12:50:23,798 - LOGGER - INFO - left, :拼图的图片数量为:8
+2024-10-02 12:50:27,263 - LOGGER - INFO - top, :拼图的图片数量为:7
+2024-10-02 12:50:28,397 - LOGGER - INFO - left, :拼图的图片数量为:23
+2024-10-02 12:50:32,384 - LOGGER - INFO - left, :拼图的图片数量为:28
+2024-10-02 12:50:41,266 - LOGGER - INFO - top, :拼图的图片数量为:9
+2024-10-02 12:50:43,031 - LOGGER - INFO - top, :拼图的图片数量为:6
+2024-10-02 12:50:55,779 - LOGGER - INFO - top, :拼图的图片数量为:117
+2024-10-02 12:50:56,404 - LOGGER - INFO - left, :拼图的图片数量为:64
+2024-10-02 12:50:56,652 - LOGGER - INFO - top, :拼图的图片数量为:7
+2024-10-02 12:51:04,386 - LOGGER - INFO - left, :拼图的图片数量为:64
+2024-10-02 12:51:18,181 - LOGGER - INFO - top, :拼图的图片数量为:112
+2024-10-02 12:51:18,197 - LOGGER - INFO - right, :拼图的图片数量为:114
+2024-10-02 12:51:24,396 - LOGGER - INFO - left, :拼图的图片数量为:212
+2024-10-02 12:51:32,846 - LOGGER - INFO - left, :拼图的图片数量为:70
+2024-10-02 12:51:33,603 - LOGGER - INFO - left, :拼图的图片数量为:8
+2024-10-02 12:51:36,460 - LOGGER - INFO - left, :拼图的图片数量为:33
+2024-10-02 12:51:40,289 - LOGGER - INFO - 存档img... 
+2024-10-02 12:51:44,421 - LOGGER - INFO - left, :拼图的图片数量为:64
+2024-10-02 12:51:47,056 - LOGGER - INFO - top, :拼图的图片数量为:413
+2024-10-02 12:51:50,933 - LOGGER - INFO - left, :拼图的图片数量为:28
+2024-10-02 12:51:52,438 - LOGGER - INFO - left, :拼图的图片数量为:14
+2024-10-02 12:52:06,594 - LOGGER - INFO - left, :拼图的图片数量为:32
+2024-10-02 12:52:18,077 - LOGGER - INFO - top, :拼图的图片数量为:6
+2024-10-02 12:52:20,341 - LOGGER - INFO - top, :拼图的图片数量为:10
+2024-10-02 12:52:32,330 - LOGGER - INFO - right, :拼图的图片数量为:64
+2024-10-02 12:52:40,035 - LOGGER - INFO - right, :拼图的图片数量为:53
+2024-10-02 12:52:45,314 - LOGGER - INFO - right, :拼图的图片数量为:15
+2024-10-02 12:52:47,245 - LOGGER - INFO - right, :拼图的图片数量为:27
+2024-10-02 12:52:52,362 - LOGGER - INFO - left, :拼图的图片数量为:256
+2024-10-02 12:52:53,764 - LOGGER - INFO - left, :拼图的图片数量为:9
+2024-10-02 12:52:54,228 - LOGGER - INFO - left, :拼图的图片数量为:4
+2024-10-02 12:53:28,427 - LOGGER - INFO - top, :拼图的图片数量为:78
+2024-10-02 12:53:47,887 - LOGGER - INFO - left, :拼图的图片数量为:824
+2024-10-02 12:53:50,334 - LOGGER - INFO - top, :拼图的图片数量为:155
+2024-10-02 12:53:56,431 - LOGGER - INFO - top, :拼图的图片数量为:67
+2024-10-02 12:54:08,573 - LOGGER - INFO - top, :拼图的图片数量为:129
+2024-10-02 12:54:11,511 - LOGGER - INFO - top, :拼图的图片数量为:38
+2024-10-02 12:54:12,546 - LOGGER - INFO - top, :拼图的图片数量为:6
+2024-10-02 12:54:16,355 - LOGGER - INFO - right, :拼图的图片数量为:64
+2024-10-02 12:54:52,435 - LOGGER - INFO - top, :拼图的图片数量为:575
+2024-10-02 12:54:56,665 - LOGGER - INFO - right, :拼图的图片数量为:5
+2024-10-02 12:55:08,894 - LOGGER - INFO - right, :拼图的图片数量为:6
+2024-10-02 12:56:42,899 - LOGGER - ERROR - front:图片断流
+2024-10-02 12:56:49,131 - LOGGER - ERROR - front:图片断流
+2024-10-02 12:56:49,197 - LOGGER - ERROR - rear:图片断流
+2024-10-02 12:56:49,213 - LOGGER - ERROR - right:图片断流
+2024-10-02 12:56:49,246 - LOGGER - ERROR - left:图片断流
+2024-10-02 12:56:49,285 - LOGGER - ERROR - top:图片断流
+2024-10-02 12:56:53,344 - LOGGER - INFO - left, :拼图的图片数量为:1605
+2024-10-02 12:56:54,508 - LOGGER - INFO - right, :拼图的图片数量为:41
+2024-10-02 12:56:58,476 - LOGGER - INFO - right, :拼图的图片数量为:15
+2024-10-02 12:58:09,651 - LOGGER - ERROR - rear:图片断流
+2024-10-02 12:58:10,308 - LOGGER - ERROR - right:图片断流
+2024-10-02 12:58:40,747 - LOGGER - ERROR - left:图片断流
+2024-10-02 12:58:48,892 - LOGGER - ERROR - ImageCaptureProcess---front:图片读取有问题
+2024-10-02 12:58:55,866 - LOGGER - ERROR - right:图片断流
+2024-10-02 12:59:03,882 - LOGGER - ERROR - left:图片断流
+2024-10-02 12:59:26,514 - LOGGER - ERROR - rear:图片断流
+2024-10-02 12:59:34,954 - LOGGER - ERROR - left:图片断流
+2024-10-02 13:00:11,443 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:00:22,132 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:00:42,186 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:00:42,565 - LOGGER - ERROR - left:图片断流
+2024-10-02 13:01:33,019 - LOGGER - ERROR - left:图片断流
+2024-10-02 13:01:33,201 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:01:39,842 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:02:06,409 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:02:05,902 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:02:06,240 - LOGGER - ERROR - ImageCaptureProcess---left:图片读取有问题
+2024-10-02 13:02:06,619 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:02:33,481 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:02:34,045 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:02:34,412 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:03:37,782 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:03:38,263 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:03:44,418 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:03:48,912 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:03:48,935 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:04:58,584 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:05:01,700 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:05:01,495 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:05:11,447 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:05:11,503 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:05:12,020 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:05:56,497 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:05:57,091 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:05:57,237 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:06:26,812 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:06:26,812 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:06:26,812 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:06:36,579 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:06:36,533 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:07:36,177 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:07:36,178 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:07:40,705 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:08:22,794 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:08:37,198 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:08:46,458 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:08:46,832 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:08:46,460 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:09:55,256 - LOGGER - ERROR - top:图片断流
+
+2024-10-02 13:10:09,607 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:10:51,243 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:10:50,255 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:12:35,871 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:12:36,054 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:12:35,613 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:13:32,209 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:13:32,340 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:14:21,815 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:14:22,895 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:14:23,758 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:14:24,123 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:15:11,499 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:15:11,422 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:15:35,708 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:16:20,385 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:16:41,021 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:16:54,474 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:17:17,830 - LOGGER - ERROR - rear:图片断流
+
+2024-10-02 13:17:45,878 - LOGGER - ERROR - rear:图片断流
+
+2024-10-02 13:17:45,888 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:18:22,242 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:18:22,249 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:18:22,388 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:19:43,072 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:19:43,429 - LOGGER - ERROR - top:图片断流
+2024-10-02 13:19:58,915 - LOGGER - ERROR - ImageCaptureProcess---top:图片读取有问题
+2024-10-02 13:20:01,204 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:20:01,332 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:20:42,831 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:20:43,125 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:19:59,004 - LOGGER - ERROR - ImageProcessWorker2--rear:error:
+2024-10-02 13:19:59,974 - LOGGER - ERROR - ImageProcessWorker2--front:error:Unable to allocate 9.38 MiB for an array with shape (1, 3, 640, 640) and data type float64
+2024-10-02 13:21:24,322 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:21:45,303 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:21:45,702 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:23:47,368 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:23:50,827 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:24:15,705 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:24:15,771 - LOGGER - ERROR - rear:图片断流
+2024-10-02 13:24:33,421 - LOGGER - ERROR - transfer_frame_gpu错误:OpenCV(4.9.0) C:\opencv_build_data\opencv-4.9.0\modules\core\src\alloc.cpp:73: error: (-4:Insufficient memory) Failed to allocate 2558400 bytes in function 'cv::OutOfMemoryError'
+
+2024-10-02 13:24:33,835 - LOGGER - ERROR - ImageCaptureProcess---rear:图片读取有问题
+2024-10-02 13:24:33,434 - LOGGER - ERROR - ImageProcessWorker2--front:error:
+2024-10-02 13:24:33,533 - LOGGER - ERROR - ImageProcessWorker2--rear:error:
+2024-10-02 13:24:39,289 - LOGGER - ERROR - ImageProcessWorker2--front:error:unpickling stack underflow
+2024-10-02 13:24:39,264 - LOGGER - ERROR - ImageProcessWorker2--rear:error:unpickling stack underflow
+2024-10-02 13:24:58,235 - LOGGER - INFO - right, :拼图的图片数量为:31
+2024-10-02 13:26:35,313 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:26:49,991 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:27:17,341 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:27:46,267 - LOGGER - INFO - right, :拼图的图片数量为:5
+2024-10-02 13:27:54,151 - LOGGER - INFO - right, :拼图的图片数量为:15
+2024-10-02 13:28:06,376 - LOGGER - INFO - right, :拼图的图片数量为:58
+2024-10-02 13:29:53,843 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:31:12,812 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:31:34,028 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:32:02,318 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:32:26,595 - LOGGER - INFO - top, :拼图的图片数量为:2080
+2024-10-02 13:32:39,335 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:33:34,458 - LOGGER - INFO - top, :拼图的图片数量为:148
+2024-10-02 13:33:35,977 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:34:15,449 - LOGGER - INFO - top, :拼图的图片数量为:6
+2024-10-02 13:34:50,086 - LOGGER - INFO - top, :拼图的图片数量为:258
+2024-10-02 13:34:50,577 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:35:47,498 - LOGGER - INFO - right, :拼图的图片数量为:9
+2024-10-02 13:35:50,025 - LOGGER - INFO - top, :拼图的图片数量为:35
+2024-10-02 13:35:51,717 - LOGGER - INFO - top, :拼图的图片数量为:17
+2024-10-02 13:36:09,751 - LOGGER - INFO - top, :拼图的图片数量为:55
+2024-10-02 13:36:36,526 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:37:59,249 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:39:20,012 - LOGGER - ERROR - right:图片断流
+2024-10-02 13:48:48,015 - LOGGER - INFO - right, :拼图的图片数量为:99
+2024-10-02 13:49:59,453 - LOGGER - INFO - right, :拼图的图片数量为:111
+2024-10-02 14:01:30,854 - LOGGER - INFO - This is an info message.
+2024-10-02 14:01:49,890 - LOGGER - INFO - This is an info message.
+2024-10-02 14:04:32,168 - LOGGER - INFO - This is an info message.
+2024-10-02 14:04:42,693 - LOGGER - INFO - This is an info message.
+2024-10-02 14:06:01,286 - LOGGER - INFO - This is an info message.
+2024-10-02 14:06:14,754 - LOGGER - INFO - This is an info message.
+2024-10-02 14:06:14,797 - LOGGER - INFO - This is an info message.
+2024-10-02 14:06:14,879 - LOGGER - INFO - This is an info message.
+2024-10-02 14:06:14,887 - LOGGER - INFO - This is an info message.
+2024-10-02 14:06:21,037 - LOGGER - INFO - This is an info message.
+2024-10-02 14:06:21,339 - LOGGER - INFO - This is an info message.
+2024-10-02 14:06:21,400 - LOGGER - INFO - This is an info message.
+2024-10-02 14:06:21,407 - LOGGER - INFO - This is an info message.
+2024-10-02 14:06:21,421 - LOGGER - INFO - This is an info message.
+2024-10-02 14:06:41,412 - LOGGER - INFO - top, :拼图的图片数量为:304
+2024-10-02 14:08:16,441 - LOGGER - INFO - right, :拼图的图片数量为:84
+2024-10-02 14:08:16,493 - LOGGER - INFO - top, :拼图的图片数量为:84
+2024-10-02 14:08:16,964 - LOGGER - INFO - left, :拼图的图片数量为:91
+2024-10-02 14:08:28,042 - LOGGER - INFO - top, :拼图的图片数量为:74
+2024-10-02 14:08:36,171 - LOGGER - INFO - top, :拼图的图片数量为:64
+2024-10-02 14:08:40,205 - LOGGER - INFO - top, :拼图的图片数量为:16
+2024-10-02 14:08:50,999 - LOGGER - INFO - top, :拼图的图片数量为:159
+2024-10-02 14:08:53,097 - LOGGER - INFO - top, :拼图的图片数量为:27
+2024-10-02 14:09:05,099 - LOGGER - INFO - top, :拼图的图片数量为:64
+2024-10-02 14:09:12,591 - LOGGER - INFO - top, :拼图的图片数量为:64
+2024-10-02 14:23:49,005 - LOGGER - INFO - This is an info message.
+2024-10-02 14:24:01,158 - LOGGER - INFO - This is an info message.
+2024-10-02 14:24:01,307 - LOGGER - INFO - This is an info message.
+2024-10-02 14:24:01,461 - LOGGER - INFO - This is an info message.
+2024-10-02 14:24:01,500 - LOGGER - INFO - This is an info message.
+2024-10-02 14:24:07,460 - LOGGER - INFO - This is an info message.
+2024-10-02 14:24:07,465 - LOGGER - INFO - This is an info message.
+2024-10-02 14:24:07,553 - LOGGER - INFO - This is an info message.
+2024-10-02 14:24:07,588 - LOGGER - INFO - This is an info message.
+2024-10-02 14:24:07,668 - LOGGER - INFO - This is an info message.
+2024-10-02 14:29:15,923 - LOGGER - INFO - This is an info message.
+2024-10-02 14:29:36,929 - LOGGER - INFO - This is an info message.
+2024-10-02 14:29:36,932 - LOGGER - INFO - This is an info message.
+2024-10-02 14:29:36,998 - LOGGER - INFO - This is an info message.
+2024-10-02 14:29:37,020 - LOGGER - INFO - This is an info message.
+2024-10-02 14:29:42,746 - LOGGER - INFO - This is an info message.
+2024-10-02 14:29:42,904 - LOGGER - INFO - This is an info message.
+2024-10-02 14:29:42,977 - LOGGER - INFO - This is an info message.
+2024-10-02 14:29:43,025 - LOGGER - INFO - This is an info message.
+2024-10-02 14:29:55,229 - LOGGER - INFO - right, :拼图的图片数量为:85
+2024-10-02 14:29:55,283 - LOGGER - INFO - left, :拼图的图片数量为:87
+2024-10-02 14:29:55,343 - LOGGER - INFO - top, :拼图的图片数量为:89
+2024-10-02 14:30:09,994 - LOGGER - INFO - top, :拼图的图片数量为:168
+2024-10-02 14:30:25,554 - LOGGER - INFO - 存档img... 
+2024-10-02 14:30:27,290 - LOGGER - INFO - top, :拼图的图片数量为:255
+2024-10-02 14:31:14,230 - LOGGER - INFO - right, :拼图的图片数量为:140
+2024-10-02 14:31:14,291 - LOGGER - INFO - left, :拼图的图片数量为:142
+2024-10-02 14:31:14,343 - LOGGER - INFO - top, :拼图的图片数量为:148
+2024-10-02 14:31:27,904 - LOGGER - INFO - top, :拼图的图片数量为:141
+2024-10-02 14:31:47,542 - LOGGER - INFO - top, :拼图的图片数量为:311
+2024-10-02 14:31:55,533 - LOGGER - INFO - top, :拼图的图片数量为:64
+2024-10-02 14:32:03,508 - LOGGER - INFO - top, :拼图的图片数量为:64
+2024-10-02 14:32:10,338 - LOGGER - INFO - top, :拼图的图片数量为:4
+2024-10-02 14:32:11,314 - LOGGER - INFO - top, :拼图的图片数量为:11
+2024-10-02 14:32:19,497 - LOGGER - INFO - top, :拼图的图片数量为:128
+2024-10-02 14:32:23,508 - LOGGER - INFO - top, :拼图的图片数量为:9
+2024-10-02 14:32:33,671 - LOGGER - INFO - top, :拼图的图片数量为:7
+2024-10-02 14:33:32,728 - LOGGER - INFO - left, :拼图的图片数量为:124
+2024-10-02 14:33:32,823 - LOGGER - INFO - right, :拼图的图片数量为:124
+2024-10-02 14:33:32,940 - LOGGER - INFO - top, :拼图的图片数量为:130
