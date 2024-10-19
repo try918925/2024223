@@ -18,10 +18,12 @@ import infer_det_rec as det_ocr
 import infer_det_rec_car as det_ocr_car
 import stichImg as ts
 from algorithms.detector import YOLOv5Detector
-import Container_det_trt_yolov5 as cont_trt_infer
+import Container_det as cont_trt_infer
+# import Container_det_trt_yolov5 as cont_trt_infer
 import time, glob, socket, zmq
 from datetime import datetime
 from configs import config_5s_trt as my_config
+from configs import config_5s_trt as door_config
 import copy
 
 run_Flag = True
@@ -156,7 +158,7 @@ class ImageProcessWorker(QThread):
                         # 连续无车
                         self.consecutive_true_count = 0
                         if len(self.frames_to_process) < 5:
-                        # print(f"清空列表1:self.frames_to_process", result)
+                            # print(f"清空列表1:self.frames_to_process", result)
                             self.frames_to_process = []
                         # 标志位，代表车辆是否有进入记录
                         if self.car_in:
@@ -188,7 +190,6 @@ class ImageProcessWorker(QThread):
                     frame = cv2.resize(frame, (2560, 1440))
                     self.frames_to_process.append(frame)
 
-                time.sleep(0.001)
 
 
 class ImageProcessRecognize(Process):
@@ -242,14 +243,16 @@ class ImageProcessWorker2(QThread):
         self.rec_queue = qu2
         self.ocr_queue = qu3
         self.frame_counter = 0
-        self.initialize_inference()
-
-    def initialize_inference(self):
-        PLUGIN_LIBRARY = "./myplugins.dll"
-        engine_file_path = "truck.engine"
-        ctypes.CDLL(PLUGIN_LIBRARY)
-        self.csd_detector = cont_trt_infer.CSD_Detector(engine_file_path)  # 初始化detector
+        # self.initialize_inference()
+        self.csd_detector = YOLOv5Detector.from_config(door_config)
         self.my_container_detect = cont_trt_infer.container_detect(self.csd_detector)
+
+    # def initialize_inference(self):
+    #     # PLUGIN_LIBRARY = "./myplugins.dll"
+    #     # engine_file_path = "truck.engine"
+    #     # ctypes.CDLL(PLUGIN_LIBRARY)
+    #     self.csd_detector = YOLOv5Detector.from_config(door_config)
+    #     self.my_container_detect = cont_trt_infer.container_detect(self.csd_detector)
 
     def delete_old_files(self):
         try:
@@ -280,7 +283,7 @@ class ImageProcessWorker2(QThread):
                             self.frame_counter = 0
                     # suanfa_time = time.time()
                     self.my_container_detect.process_frame(frame)
-                    _, reuslt_dict = self.my_container_detect.get_result()
+                    reuslt_dict = self.my_container_detect.get_result()
                     if reuslt_dict:
                         res_dict_lst.append(reuslt_dict)
                         if self.camera_id == 1:
@@ -294,7 +297,7 @@ class ImageProcessWorker2(QThread):
                         # 当连续10帧(约1s)没有集装箱面，且之前有卡车进入时，获取前一段时间面积最大帧
                         # print('当连续18帧(约1s)没有集装箱面，且之前有卡车进入时，获取前一段时间面积最大帧')
                         # tuili_time = time.time()
-                        reuslt_dict, _ = self.my_container_detect.get_result()
+                        reuslt_dict = self.my_container_detect.get_result()
                         # ocr队列采集
                         self.ocr_queue.put(((self.camera_id + 6), reuslt_dict['img']))
                         final_label, _ = self.my_container_detect.door_label_vote(res_dict_lst)
@@ -315,9 +318,8 @@ class ImageProcessWorker2(QThread):
                         # !!! 获取最大面积图像后刷新是否有车的状态、刷新存下的结果
                         self.my_container_detect.new_truck = False
                         self.my_container_detect.max_area_dict.clear()
-                        self.my_container_detect.res_dict.clear()
+                        # self.my_container_detect.res_dict.clear()
                         res_dict_lst.clear()
-                    time.sleep(0.001)
                     # print(f"{self.direction}的总体时间为:{time.time() - start_time}")
             except Exception as error:
                 print(f"ImageProcessWorker2--{self.direction}:error:{error}")
@@ -597,13 +599,13 @@ class MainWindow(QMainWindow):
             worker.dataQueued.connect(self.update_label_1)
             worker.frameCaptured.connect(self.update_label)
 
-        # self.additional_image_workers = [ImageProcessWorker2(camera_info, queue, self.rec_queue, self.ocr_queue) for
-        #                                  camera_info, queue in
-        #                                  zip(list(self.camera_config.values())[3:], self.original_queues[3:])]
+        self.additional_image_workers = [ImageProcessWorker2(camera_info, queue, self.rec_queue, self.ocr_queue) for
+                                         camera_info, queue in
+                                         zip(list(self.camera_config.values())[3:], self.original_queues[3:])]
 
-        # for worker in self.additional_image_workers:
-        #     worker.image_processed.connect(self.handle_image_processed)
-        #     worker.dataQueued.connect(self.update_label_2)
+        for worker in self.additional_image_workers:
+            worker.image_processed.connect(self.handle_image_processed)
+            worker.dataQueued.connect(self.update_label_2)
 
         self.recognize_processes = [ImageProcessRecognize(original_queues, result_queues) for
                                     original_queues, result_queues in
@@ -624,8 +626,8 @@ class MainWindow(QMainWindow):
         for worker in self.image_process_workers:
             worker.start()
 
-        # for worker in self.additional_image_workers:
-        #     worker.start()
+        for worker in self.additional_image_workers:
+            worker.start()
 
         for recognize in self.recognize_processes:
             recognize.start()

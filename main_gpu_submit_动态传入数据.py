@@ -219,7 +219,7 @@ class ImageProcessWorker(QThread):
                     frame = cv2.resize(frame, (2560, 1440))
                     self.frames_to_process.append(frame)
 
-                time.sleep(0.0001)
+                # time.sleep(0.0001)
 
 
 class ImageProcessRecognize(Process):
@@ -365,7 +365,7 @@ class ImageProcessWorker2(QThread):
                     self.my_container_detect.max_area_dict.clear()
                     # self.my_container_detect.res_dict.clear()
                     res_dict_lst.clear()
-                time.sleep(0.001)
+                # time.sleep(0.001)
                 # print(f"{self.direction}的总体时间为:{time.time() - start_time}")
             # except Exception as error:
             #     print(f"ImageProcessWorker2--{self.direction}:error:{error}")

@@ -12,7 +12,7 @@ class ImageCaptureProcess(Process):
     def __init__(self, camera_info, queue):
         super().__init__()
         # self.file_path = "rtsp://admin:Dtd12345++@172.20.71.111:554/Streaming/Channels/101"
-        self.file_path = r"C:\TianjinGangTest\10181402\rear.mp4"
+        self.file_path = "C:/TianJinGangTest/10191614/rear.mp4"
         self.roi = [450, 1440, 780, 1700]
         self.stop_flag = False
         self.queue = queue  # 使用队列来传递数据

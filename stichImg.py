@@ -26,9 +26,9 @@ class stiching_img(object):
                 self.newLst.append(img2)
 
         result = stichAll(self.newImg, self.offLst, v)
-        # self.newLst.clear()
-        # self.offLst.clear()
-        # self.newImg.clear()
+        self.newLst.clear()
+        self.offLst.clear()
+        self.newImg.clear()
 
         return result
 

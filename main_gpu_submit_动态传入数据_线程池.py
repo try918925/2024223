@@ -23,7 +23,7 @@ import Container_det as cont_trt_infer
 import time, glob, socket, zmq
 from datetime import datetime
 from configs import config_5s_trt as my_config
-from configs import config_5s_trt_door as door_config
+from configs import config_5s_trt as door_config
 import copy
 
 # import psutil,GPUtil
@@ -139,6 +139,7 @@ class ImageProcessWorker(QThread):
             return 1
 
     def process_frames(self, frames, id, num, status):
+        # start_time = time.time()
         result = None
         state = None
         if id == 1:
@@ -193,10 +194,8 @@ class ImageProcessWorker(QThread):
                             # print(self.direction, f"---{self.count}:传入图数为:{len(self.frames_to_process)}")
                             # threading.Thread(target=self.process_frames,
                             #                  args=(self.frames_to_process, self.camera_id, self.count, True)).start()
-
                             self.executor.submit(self.process_frames, self.frames_to_process, self.camera_id,
                                                  self.count, True)
-
                             self.count = 0
                             self.count_all = 0
                             self.frames_to_process = []
@@ -212,7 +211,6 @@ class ImageProcessWorker(QThread):
                         # print(self.direction, f"---{self.count}:传入图数为:{len(self.frames_to_process)}", )
                         # threading.Thread(target=self.process_frames,
                         #                  args=(self.frames_to_process, self.camera_id, self.count, False)).start()
-
                         self.executor.submit(self.process_frames, self.frames_to_process, self.camera_id, self.count,
                                              False)
 
@@ -227,7 +225,7 @@ class ImageProcessWorker(QThread):
                     frame = cv2.resize(frame, (2560, 1440))
                     self.frames_to_process.append(frame)
 
-                time.sleep(0.0001)
+                # time.sleep(0.0001)
 
 
 class ImageProcessRecognize(Process):
@@ -294,9 +292,9 @@ class ImageProcessWorker2(QThread):
         self.initialize_inference()
 
     def initialize_inference(self):
-        # PLUGIN_LIBRARY = "./myplugins.dll"
-        # engine_file_path = "truck.engine"
-        # ctypes.CDLL(PLUGIN_LIBRARY)
+        PLUGIN_LIBRARY = "./myplugins.dll"
+        engine_file_path = "truck.engine"
+        ctypes.CDLL(PLUGIN_LIBRARY)
         self.csd_detector = YOLOv5Detector.from_config(door_config)
         self.my_container_detect = cont_trt_infer.container_detect(self.csd_detector)
 
@@ -373,7 +371,7 @@ class ImageProcessWorker2(QThread):
                     self.my_container_detect.max_area_dict.clear()
                     # self.my_container_detect.res_dict.clear()
                     res_dict_lst.clear()
-                time.sleep(0.001)
+                # time.sleep(0.0001)
                 # print(f"{self.direction}的总体时间为:{time.time() - start_time}")
             # except Exception as error:
             #     print(f"ImageProcessWorker2--{self.direction}:error:{error}")

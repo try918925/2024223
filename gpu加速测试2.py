@@ -18,7 +18,7 @@ class ImageCaptureProcess(Process):
     def __init__(self, camera_info, queue):
         super().__init__()
         # self.file_path = "C:/Users/Install/Desktop/2024223/my_test_img/20240911-175546.mp4"
-        self.file_path = r"C:\TianjinGangTest\10181402\right.mp4"
+        self.file_path = r"C:\TianjinGangTest\10181418\right.mp4"
         self.roi = [450, 1440, 780, 1700]
         self.stop_flag = False
         self.queue = queue  # 使用队列来传递数据
@@ -39,9 +39,10 @@ class ImageCaptureProcess(Process):
                     frame = frame[:, :, :3]
                     frame_counter += 1
                     if frame_counter % 2 == 1:
-                        # path = f"C:/Users/Install/Desktop/2024223/my_test_img/front/{time_str()}.jpg"
+                        path = f"C:/Users/hello/Desktop/2024223/my_test_img/right/{time.time()}.jpg"
+                        cv2.imwrite(path,frame)
                         # self.queue.put((path, frame))
-                        print(frame)
+                        # print(frame)
                         print("完成一个:",frame_counter)
             except Exception as e:
                 print("Error:", e)
