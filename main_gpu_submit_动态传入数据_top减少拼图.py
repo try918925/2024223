@@ -249,7 +249,7 @@ class ImageProcessRecognize(Process):
                 # print("ImageProcessRecognize", camera_id, self.original_queue.qsize(), "/n")
                 self.count += 1
                 self.count_top += 1
-                if self.count % 2 == 0:
+                if self.count % 2 == 0 and camera_id != 1:
                     thread1 = self.trt_infer.inferThread(self.mobilenet_wrapper, [seg_frame])
                     thread1.start()
                     thread1.join()
@@ -257,8 +257,16 @@ class ImageProcessRecognize(Process):
                     self.result_queue.put((camera_id, result, frame))
                     self.count = 0
                 else:
-                    self.result_queue.put((camera_id, "NO", frame))
+                    if camera_id != 1:
+                        self.result_queue.put((camera_id, "NO", frame))
 
+                if self.count_top % 3 == 0 and camera_id == 1:
+                    thread1 = self.trt_infer.inferThread(self.mobilenet_wrapper, [seg_frame])
+                    thread1.start()
+                    thread1.join()
+                    result = thread1.get_result()
+                    self.result_queue.put((camera_id, result, frame))
+                    self.count_top = 0
 
 
 class ImageProcessWorker2(QThread):

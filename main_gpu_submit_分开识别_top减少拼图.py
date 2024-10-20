@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import os
+
 os.add_dll_directory(r"C:/opencv-4.9.0/build/install/x64/vc16/bin")
 os.add_dll_directory(r"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.8/bin")
 import cv2
@@ -26,16 +27,6 @@ from configs import config_5s_trt as my_config
 from configs import config_5s_trt as door_config
 import copy
 
-# import psutil,GPUtil
-#
-#
-# gpus = GPUtil.getGPUs()
-# cpu_usage = psutil.cpu_percent(interval=1)11
-# memory_info = psutil.virtual_memory()
-# def get_gpu_info():
-#     print(f"GPU显存使用: {gpus[0].memoryUsed}MB / {gpus[0].memoryTotal}MB")
-#     print(f"cpu百分比:{cpu_usage},内存百分比占用:{memory_info.percent},")
-
 run_Flag = True
 xiangti = ''
 rear_truck = False
@@ -53,12 +44,6 @@ weights_dict = {
 lp = det_ocr_car.OCR_process(weights_dict)
 
 
-def time_str(fmt=None):
-    if fmt is None:
-        fmt = '%Y_%m_%d_%H_%M_%S_%f'
-    return datetime.today().strftime(fmt)
-
-
 class ImageCaptureProcess(Process):
     def __init__(self, camera_info, queue):
         super().__init__()
@@ -69,7 +54,7 @@ class ImageCaptureProcess(Process):
         self.queue = queue
         self.front_rear = ("front", "rear")
         self.left_right_top = ("right", "left", "top")
-        self.dsize = (900, 600)
+        self.dsize = (1066, 600)
         self.roi_cols = (self.roi[2], self.roi[3])
         self.roi_rows = (self.roi[0], self.roi[1])
         self.counter = 0
@@ -120,7 +105,6 @@ class ImageProcessWorker(QThread):
         self.ocr_queue = qu2
         self.true_threshold = 3
         self.detector = YOLOv5Detector.from_config(my_config)
-        self.my_stiching = ts.stiching_distribution()
 
     def call_shuangxiang(self, frame):
         global xiangti
@@ -137,30 +121,27 @@ class ImageProcessWorker(QThread):
             xiangti = '单箱'
             return 1
 
-    def process_frames(self, frames, id, num, status):
-        # start_time = time.time()
-        result = None
-        state = None
+    def process_frames(self, frames, id):
+        my_stiching = ts.stiching_img()
+        print(f"{self.direction}, :拼图的图片数量为:{len(frames)}", )
+        start_time = time.time()
         if id == 1:
-            result, state = self.my_stiching.stiching(frames, "top", num, status)
-        elif id == 0:
-            result, state = self.my_stiching.stiching(frames, "left", num, status)
-        elif id == 2:
-            result, state = self.my_stiching.stiching(frames, "right", num, status)
-        # print(f"拼接完成 ID: {id}")
-        if state:
-            # print("+++++++++++++++++++++++++++")
-            # print(result, state)
-            # print("+++++++++++++++++++++++++++")
-            if id == 2:
-                thread = threading.Thread(target=self.call_shuangxiang, args=(result,))
-                # 启动线程
-                thread.start()
+            result = my_stiching.stiching(frames, "top")
+        if id == 0:
+            result = my_stiching.stiching(frames, "left")
+        if id == 2:
+            result = my_stiching.stiching(frames, "right")
+
+        if id == 2 and frames:
+            thread = threading.Thread(target=self.call_shuangxiang, args=(result,))
+            # 启动线程
+            thread.start()
+        if frames:
+            print(f"{self.direction}, :拼图的时间为:{time.time() - start_time}", )
 
             resized_image = cv2.resize(result, (1278, 344))
             self.dataQueued.emit(id, resized_image)
 
-            # print(f"拼图的时间为: {time.time() - start_time}")
             cv2.imwrite(f'tmp/{id}.jpg', result)
 
     def run(self):
@@ -168,8 +149,6 @@ class ImageProcessWorker(QThread):
         self.car_in = False
         self.consecutive_true_count = 0
         self.consecutive_zero_count = 0
-        self.count = 0
-        self.count_all = 0
         while run_Flag:
             if not self.result_queue.empty():
                 self.camera_id, result, frame = self.result_queue.get()
@@ -186,29 +165,22 @@ class ImageProcessWorker(QThread):
                         if self.car_in:
                             self.car_in = False
                             self.frameCaptured.emit(self.camera_id, 0)
-                            self.count += 1
-                            self.count_all += len(self.frames_to_process)
-                            print(self.direction, "传入的总图数量为：", self.count_all)
-                            # print(self.direction, f"---{self.count}:传入图数为:{len(self.frames_to_process)}")
+
                             threading.Thread(target=self.process_frames,
-                                             args=(self.frames_to_process, self.camera_id, self.count, True)).start()
-                            self.count = 0
-                            self.count_all = 0
-                            self.frames_to_process = []
+                                             args=(self.frames_to_process, self.camera_id)).start()
+                            #
+                            # self.frames_to_process = []
 
                 if result == 0:
                     frame = cv2.resize(frame, (2560, 1440))
                     self.consecutive_true_count = 0
                     self.consecutive_zero_count += 1
                     self.frames_to_process.append(frame)
-                    if len(self.frames_to_process) >= 50:
-                        self.count += 1
-                        self.count_all += len(self.frames_to_process)
-                        # print(self.direction, f"---{self.count}:传入图数为:{len(self.frames_to_process)}", )
-                        threading.Thread(target=self.process_frames,
-                                         args=(self.frames_to_process, self.camera_id, self.count, False)).start()
-
-                        self.frames_to_process = []
+                    # if len(self.frames_to_process) >= 10:
+                    #     threading.Thread(target=self.process_frames,
+                    #                      args=(self.frames_to_process, self.camera_id)).start()
+                    #
+                    #     self.frames_to_process = []
 
                     if self.consecutive_zero_count > 3:
                         self.car_in = True
@@ -218,8 +190,6 @@ class ImageProcessWorker(QThread):
                 if result == "NO" and self.car_in:
                     frame = cv2.resize(frame, (2560, 1440))
                     self.frames_to_process.append(frame)
-
-                # time.sleep(0.0001)
 
 
 class ImageProcessRecognize(Process):
@@ -249,7 +219,7 @@ class ImageProcessRecognize(Process):
                 # print("ImageProcessRecognize", camera_id, self.original_queue.qsize(), "/n")
                 self.count += 1
                 self.count_top += 1
-                if self.count % 2 == 0:
+                if self.count % 2 == 0 and camera_id != 1:
                     thread1 = self.trt_infer.inferThread(self.mobilenet_wrapper, [seg_frame])
                     thread1.start()
                     thread1.join()
@@ -257,8 +227,16 @@ class ImageProcessRecognize(Process):
                     self.result_queue.put((camera_id, result, frame))
                     self.count = 0
                 else:
-                    self.result_queue.put((camera_id, "NO", frame))
+                    if camera_id != 1:
+                        self.result_queue.put((camera_id, "NO", frame))
 
+                if self.count_top % 3 == 0 and camera_id == 1:
+                    thread1 = self.trt_infer.inferThread(self.mobilenet_wrapper, [seg_frame])
+                    thread1.start()
+                    thread1.join()
+                    result = thread1.get_result()
+                    self.result_queue.put((camera_id, result, frame))
+                    self.count_top = 0
 
 
 class ImageProcessWorker2(QThread):
@@ -275,14 +253,16 @@ class ImageProcessWorker2(QThread):
         self.rec_queue = qu2
         self.ocr_queue = qu3
         self.frame_counter = 0
-        self.initialize_inference()
-
-    def initialize_inference(self):
-        PLUGIN_LIBRARY = "./myplugins.dll"
-        engine_file_path = "truck.engine"
-        ctypes.CDLL(PLUGIN_LIBRARY)
+        # self.initialize_inference()
         self.csd_detector = YOLOv5Detector.from_config(door_config)
         self.my_container_detect = cont_trt_infer.container_detect(self.csd_detector)
+
+    # def initialize_inference(self):
+    #     # PLUGIN_LIBRARY = "./myplugins.dll"
+    #     # engine_file_path = "truck.engine"
+    #     # ctypes.CDLL(PLUGIN_LIBRARY)
+    #     self.csd_detector = YOLOv5Detector.from_config(door_config)
+    #     self.my_container_detect = cont_trt_infer.container_detect(self.csd_detector)
 
     def delete_old_files(self):
         try:
@@ -301,66 +281,61 @@ class ImageProcessWorker2(QThread):
         res_dict_lst = []
         rear_count = 0
         while run_Flag:
-            if not self.queue.empty():
-                self.camera_id, frame = self.queue.get()
-                # print("ImageProcessWorker2", self.camera_id, self.queue.qsize(), "/n")
-                self.frame_counter += 1
-                # rec队列采集 front==0
-                if self.camera_id == 0:
-                    if self.frame_counter == 3:
-                        self.rec_queue.put((self.camera_id, frame))
-                        self.frame_counter = 0
-                # suanfa_time = time.time()
-                self.my_container_detect.process_frame(frame)
-                # _, reuslt_dict = self.my_container_detect.get_result()
-                reuslt_dict = self.my_container_detect.get_result()
-                if reuslt_dict:
-                    res_dict_lst.append(reuslt_dict)
-                    if self.camera_id == 1:
-                        rear_count += 1
-                    if rear_count >= 50:
-                        if not rear_truck:
-                            self.dataQueued.emit(self.camera_id, reuslt_dict['img'])
-                            # print(self.direction)
-                            # cv2.imwrite(f"C:/Users/hello/Desktop/2024223/my_test_img/{self.direction}/{time.time()}.jpg",
-                            #             reuslt_dict['img'])
-                        rear_count = 0
-                # print(f"{self.direction}的算法时间为:{time.time() - suanfa_time}")
-                if self.my_container_detect.non_truck > 5 and self.my_container_detect.new_truck:
-                    # 当连续10帧(约1s)没有集装箱面，且之前有卡车进入时，获取前一段时间面积最大帧
-                    # print('当连续18帧(约1s)没有集装箱面，且之前有卡车进入时，获取前一段时间面积最大帧')
-                    # tuili_time = time.time()
+            try:
+                if not self.queue.empty():
+                    self.camera_id, frame = self.queue.get()
+                    # print("ImageProcessWorker2", self.camera_id, self.queue.qsize(), "/n")
+                    self.frame_counter += 1
+                    # rec队列采集 front==0
+                    if self.camera_id == 0:
+                        if self.frame_counter == 3:
+                            self.rec_queue.put((self.camera_id, frame))
+                            self.frame_counter = 0
+                    # suanfa_time = time.time()
+                    self.my_container_detect.process_frame(frame)
                     reuslt_dict = self.my_container_detect.get_result()
-                    # ocr队列采集
-                    self.ocr_queue.put(((self.camera_id + 6), reuslt_dict['img']))
-                    final_label, _ = self.my_container_detect.door_label_vote(res_dict_lst)
-                    # print(f"{self.direction}:集装箱面的推理时间为:{time.time() - tuili_time}")
+                    if reuslt_dict:
+                        res_dict_lst.append(reuslt_dict)
+                        print("====================",reuslt_dict)
+                        path = fr"C:\Users\hello\Desktop\2024223\my_test_img\{self.direction}\{time.time()}.jpg"
+                        cv2.imwrite(path,reuslt_dict['img'])
+                        if self.camera_id == 1:
+                            rear_count += 1
+                        if rear_count >= 50:
+                            if not rear_truck:
+                                self.dataQueued.emit(self.camera_id, reuslt_dict['img'])
+                            rear_count = 0
+                    # print(f"{self.direction}的算法时间为:{time.time() - suanfa_time}")
+                    if self.my_container_detect.non_truck > 5 and self.my_container_detect.new_truck:
+                        # 当连续10帧(约1s)没有集装箱面，且之前有卡车进入时，获取前一段时间面积最大帧
+                        # print('当连续18帧(约1s)没有集装箱面，且之前有卡车进入时，获取前一段时间面积最大帧')
+                        # tuili_time = time.time()
+                        reuslt_dict = self.my_container_detect.get_result()
+                        # ocr队列采集
+                        self.ocr_queue.put(((self.camera_id + 6), reuslt_dict['img']))
+                        final_label, _ = self.my_container_detect.door_label_vote(res_dict_lst)
+                        # print(f"{self.direction}:集装箱面的推理时间为:{time.time() - tuili_time}")
 
-                    # 界面刷新
-                    self.dataQueued.emit(self.camera_id, reuslt_dict['img'])
-
-                    # cv2.imwrite(f"C:/Users/hello/Desktop/2024223/my_test_img/{self.direction}/{time.time()}.jpg",
-                    #             reuslt_dict['img'])
-
-                    if final_label == 'door':
-                        self.ocr_queue.put(((self.camera_id + 10), None))
-                    self.clear_writer_img(self.camera_id, reuslt_dict["img"])
-                    if self.camera_id == 1:
-                        rear_truck = True
-                        self.rec_queue.put((5, None))
-                        self.ocr_queue.put((5, None))
-                        # print('---------car away out----------- ')
-                    else:
-                        rear_truck = False
-                    # !!! 获取最大面积图像后刷新是否有车的状态、刷新存下的结果
-                    self.my_container_detect.new_truck = False
-                    self.my_container_detect.max_area_dict.clear()
-                    # self.my_container_detect.res_dict.clear()
-                    res_dict_lst.clear()
-                # time.sleep(0.001)
-                # print(f"{self.direction}的总体时间为:{time.time() - start_time}")
-            # except Exception as error:
-            #     print(f"ImageProcessWorker2--{self.direction}:error:{error}")
+                        # 界面刷新
+                        self.dataQueued.emit(self.camera_id, reuslt_dict['img'])
+                        if final_label == 'door':
+                            self.ocr_queue.put(((self.camera_id + 10), None))
+                        self.clear_writer_img(self.camera_id, reuslt_dict["img"])
+                        if self.camera_id == 1:
+                            rear_truck = True
+                            self.rec_queue.put((5, None))
+                            self.ocr_queue.put((5, None))
+                            print('---------car away out----------- ')
+                        else:
+                            rear_truck = False
+                        # !!! 获取最大面积图像后刷新是否有车的状态、刷新存下的结果
+                        self.my_container_detect.new_truck = False
+                        self.my_container_detect.max_area_dict.clear()
+                        # self.my_container_detect.res_dict.clear()
+                        res_dict_lst.clear()
+                    # print(f"{self.direction}的总体时间为:{time.time() - start_time}")
+            except Exception as error:
+                print(f"ImageProcessWorker2--{self.direction}:error:{error}")
 
     def clear_writer_img(self, camera_id, frame):
         file_path = f'tmp/{camera_id + 3}.jpg'
@@ -444,7 +419,7 @@ class SaveProcessWorker(QThread):
             if xiangti == "":
                 time.sleep(3)
             with open(ocr_path, 'a', encoding='utf-8') as file:
-                file.write(xiangti + '/n')
+                file.write(xiangti + '\n')
             print("----执行完成----")
 
             xiangti = ''
@@ -539,15 +514,15 @@ class OcrThread(QThread):
     def write_ocr_data(self, ultra_result, ocr_data_dict):
         file_path = 'tmp/ocr.txt'
         # 写入结果到文件中
-        # print("准备写入数据orc:", ultra_result, ocr_data_dict)
+        print("准备写入数据orc:", ultra_result, ocr_data_dict)
         with open(file_path, 'w', encoding='utf-8') as file:
             ultra_result = ultra_result[:-4] + ' ' + ultra_result[-4:]
-            file.write(ultra_result + '/n')
+            file.write(ultra_result + '\n')
             if ocr_data_dict['front']:
-                file.write(ocr_data_dict['front'] + '/n')
+                file.write(ocr_data_dict['front'] + '\n')
             if ocr_data_dict['rear']:
-                file.write(ocr_data_dict['rear'] + '/n')
-        # print("结果已保存到文件:", 'tmp/ocr.txt')
+                file.write(ocr_data_dict['rear'] + '\n')
+        print("结果已保存到文件:", 'tmp/ocr.txt')
 
 
 class RecThread(QThread):
@@ -670,7 +645,7 @@ class MainWindow(QMainWindow):
         for recognize in self.recognize_processes:
             recognize.start()
 
-        time.sleep(5)
+        time.sleep(2)
 
         for process in self.capture_processes:
             process.start()
