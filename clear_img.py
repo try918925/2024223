@@ -24,7 +24,7 @@ def clean_all_directories(base_directory, keep_latest=20):
 if __name__ == '__main__':
 
     # 基础目录，替换为你的my_test_img目录路径
-    base_directory = 'my_test_img'
+    base_directory = 'C:/TianjinGangTest'
     # 清理所有子目录，只保留最新的20张图片
     while True:
         try:

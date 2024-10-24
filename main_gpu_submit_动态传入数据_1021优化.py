@@ -12,7 +12,7 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from uuu import Ui_MainWindow
 import threading
-from concurrent.futures import ThreadPoolExecutor
+# from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Queue, Process, freeze_support
 import test_infer as trt_infer
 import infer_det_rec as det_ocr
@@ -26,16 +26,6 @@ from datetime import datetime
 from configs import config_5s_trt as my_config
 from configs import config_5s_trt as door_config
 import copy
-
-# import psutil,GPUtil
-#
-#
-# gpus = GPUtil.getGPUs()
-# cpu_usage = psutil.cpu_percent(interval=1)11
-# memory_info = psutil.virtual_memory()
-# def get_gpu_info():
-#     print(f"GPU显存使用: {gpus[0].memoryUsed}MB / {gpus[0].memoryTotal}MB")
-#     print(f"cpu百分比:{cpu_usage},内存百分比占用:{memory_info.percent},")
 
 run_Flag = True
 xiangti = ''
@@ -76,44 +66,25 @@ class ImageCaptureProcess(Process):
         self.counter = 0
 
     def run(self):
-        start_time = time.time()
-        count = 0
         try:
             decoder = cv2.cudacodec.createVideoReader(self.file_path)
-            decoder.set(cv2.CAP_PROP_FPS, 15)
             while True:
                 ret, frame = decoder.nextFrame()
                 if not ret or frame is None:
                     decoder = cv2.cudacodec.createVideoReader(self.file_path)
-                    decoder.set(cv2.CAP_PROP_FPS, 15)
                     print(f"{self.direction}:识别断流........")
                     continue
                 if self.direction in self.front_rear:
                     self.counter += 1
                     if self.counter % 2 == 0:
-                        frame_crop = frame.colRange(self.roi_cols[0], self.roi_cols[1]).rowRange(self.roi_rows[0],
-                                                                                                 self.roi_rows[1])
-                        frame_cpu = frame_crop.download()  # 裁剪后的图像下载到 CPU
-                        frame_cpu = frame_cpu[:, :, :3]  # 裁剪通道
-                        self.queue.put((self.camera_id, frame_cpu))
+                        # frame_cpu = frame.download()
+                        # frame_cpu = frame_cpu[:, :, :3]
+                        self.queue.put((self.camera_id, frame))
                         self.counter = 0
                 else:
-                    frame_resized = cv2.cuda.resize(frame, self.dsize)  # 对原图进行 resize
-                    frame_crop = frame.colRange(self.roi_cols[0], self.roi_cols[1]).rowRange(self.roi_rows[0],
-                                                                                             self.roi_rows[1])
-                    frame_cpu_crop = frame_crop.download()  # 裁剪后的图像
-                    frame_cpu_resized = frame_resized.download()  # 调整大小后的图像
-                    frame_cpu_crop = frame_cpu_crop[:, :, :3]
-                    frame_cpu_resized = frame_cpu_resized[:, :, :3]
-                    self.queue.put((self.camera_id, frame_cpu_resized, frame_cpu_crop))
-
-                count += 1
-                end_time = time.time() - start_time
-                if end_time >= 1:
-                    print(f"{self.direction} 数量 {count}   时间:{end_time}")
-                    start_time = time.time()
-                    count = 0
-
+                    # frame_cpu = frame.download()  # 调整大小后的图像
+                    # frame_cpu = frame[:, :, :3]
+                    self.queue.put((self.camera_id, frame))
         except Exception as error:
             print(f"ImageCaptureProcess---{self.direction}:图片读取有问题:{error}")
 
@@ -129,12 +100,33 @@ class ImageProcessWorker(QThread):
         self.file_path = camera_info['file_path']
         self.direction = camera_info['direction']
         self.roi = camera_info.get('roi', None)
+        self.roi_cols = (self.roi[2], self.roi[3])
+        self.roi_rows = (self.roi[0], self.roi[1])
         self.result_queue = result_queue
         self.ocr_queue = qu2
         self.true_threshold = 3
+
+        self.count = 0
+        self.count_all = 0
+        self.count_top = 0
+
         self.detector = YOLOv5Detector.from_config(my_config)
         self.my_stiching = ts.stiching_distribution()
-        self.executor = ThreadPoolExecutor(max_workers=6)
+
+        self.init_data()
+
+    def init_data(self):
+        self.trt_infer = trt_infer
+        cfg_dict = {
+            "engine_path": "./tianJinGang.engine",
+            "class": [0, 1]  # 0 有车，result：1没车
+        }
+        self.mobilenet_wrapper = self.trt_infer.MobilenetTRT(cfg_dict["engine_path"])
+        # 执行 warm-up 操作
+        for i in range(10):
+            thread1 = self.trt_infer.warmUpThread(self.mobilenet_wrapper)
+            thread1.start()
+            thread1.join()
 
     def call_shuangxiang(self, frame):
         global xiangti
@@ -167,10 +159,9 @@ class ImageProcessWorker(QThread):
             # print(result, state)
             # print("+++++++++++++++++++++++++++")
             if id == 2:
-                # thread = threading.Thread(target=self.call_shuangxiang, args=(result,))
-                # # 启动线程
-                # thread.start()
-                self.executor.submit(self.call_shuangxiang, result)
+                thread = threading.Thread(target=self.call_shuangxiang, args=(result,))
+                # 启动线程
+                thread.start()
 
             resized_image = cv2.resize(result, (1278, 344))
             self.dataQueued.emit(id, resized_image)
@@ -183,11 +174,10 @@ class ImageProcessWorker(QThread):
         self.car_in = False
         self.consecutive_true_count = 0
         self.consecutive_zero_count = 0
-        self.count = 0
-        self.count_all = 0
         while run_Flag:
             if not self.result_queue.empty():
-                self.camera_id, result, frame = self.result_queue.get()
+                self.camera_id, frame = self.result_queue.get()
+                result = self.recognize_frame(frame)
                 if result == 1:
                     self.consecutive_zero_count = 0
                     self.consecutive_true_count += 1
@@ -205,27 +195,27 @@ class ImageProcessWorker(QThread):
                             self.count_all += len(self.frames_to_process)
                             print(self.direction, "传入的总图数量为：", self.count_all)
                             # print(self.direction, f"---{self.count}:传入图数为:{len(self.frames_to_process)}")
-                            # threading.Thread(target=self.process_frames,
-                            #                  args=(self.frames_to_process, self.camera_id, self.count, True)).start()
-                            self.executor.submit(self.process_frames, self.frames_to_process, self.camera_id,
-                                                 self.count, True)
+                            threading.Thread(target=self.process_frames,
+                                             args=(self.frames_to_process, self.camera_id, self.count, True)).start()
                             self.count = 0
                             self.count_all = 0
                             self.frames_to_process = []
 
                 if result == 0:
-                    frame = cv2.resize(frame, (2560, 1440))
+                    # frame = cv2.resize(frame, (2560, 1440))
                     self.consecutive_true_count = 0
                     self.consecutive_zero_count += 1
                     self.frames_to_process.append(frame)
+
+                    path = f'C:/TianjinGangTest/{self.camera_id}/{time.time()}.jpg'
+                    cv2.imwrite(path, frame)
+
                     if len(self.frames_to_process) >= 50:
                         self.count += 1
                         self.count_all += len(self.frames_to_process)
                         # print(self.direction, f"---{self.count}:传入图数为:{len(self.frames_to_process)}", )
-                        # threading.Thread(target=self.process_frames,
-                        #                  args=(self.frames_to_process, self.camera_id, self.count, False)).start()
-                        self.executor.submit(self.process_frames, self.frames_to_process, self.camera_id, self.count,
-                                             False)
+                        threading.Thread(target=self.process_frames,
+                                         args=(self.frames_to_process, self.camera_id, self.count, False)).start()
 
                         self.frames_to_process = []
 
@@ -235,10 +225,40 @@ class ImageProcessWorker(QThread):
                         self.image_processed.emit(self.camera_id, None)
 
                 if result == "NO" and self.car_in:
-                    frame = cv2.resize(frame, (2560, 1440))
+                    # frame = cv2.resize(frame, (2560, 1440))
+                    path = f'C:/TianjinGangTest/{self.camera_id}/{time.time()}.jpg'
+                    cv2.imwrite(path, frame)
                     self.frames_to_process.append(frame)
 
-                # time.sleep(0.0001)
+    def recognize_frame(self, frame):
+        seg_frame = frame.colRange(self.roi_cols[0], self.roi_cols[1]).rowRange(self.roi_rows[0],
+                                                                                self.roi_rows[1])
+        self.count += 1
+        self.count_top += 1
+        if self.count % 2 == 0 and self.camera_id != 1:
+            thread1 = self.trt_infer.inferThread(self.mobilenet_wrapper, [seg_frame])
+            thread1.start()
+            thread1.join()
+            result = thread1.get_result()
+            # frame = frame.download()[:, :, :3]
+            # self.result_queue.put((self.camera_id, result, frame))
+            return result
+            self.count = 0
+        else:
+            if self.camera_id != 1:
+                # frame = frame.download()[:, :, :3]
+                # self.result_queue.put((self.camera_id, "NO", frame))
+                return "NO"
+
+        if self.count_top % 3 == 0 and self.camera_id == 1:
+            thread1 = self.trt_infer.inferThread(self.mobilenet_wrapper, [seg_frame])
+            thread1.start()
+            thread1.join()
+            result = thread1.get_result()
+            # frame = frame.download()[:, :, :3]
+            # self.result_queue.put((self.camera_id, result, frame))
+            return result
+            self.count_top = 0
 
 
 class ImageProcessRecognize(Process):
@@ -248,6 +268,9 @@ class ImageProcessRecognize(Process):
         self.result_queue = result_queue
         self.count = 0
         self.count_top = 0
+        self.roi = None
+        self.roi_cols = None
+        self.roi_rows = None
 
     def run(self):
         self.trt_infer = trt_infer
@@ -263,7 +286,22 @@ class ImageProcessRecognize(Process):
             thread1.join()
         while run_Flag:
             if not self.original_queue.empty():
-                camera_id, frame, seg_frame = self.original_queue.get()
+                camera_id, frame = self.original_queue.get()
+                if camera_id == 0:
+                    self.roi = [400, 1300, 50, 950]
+                    self.roi_cols = (self.roi[2], self.roi[3])
+                    self.roi_rows = (self.roi[0], self.roi[1])
+                if camera_id == 1:
+                    self.roi = [250, 1350, 780, 1880]
+                    self.roi_cols = (self.roi[2], self.roi[3])
+                    self.roi_rows = (self.roi[0], self.roi[1])
+                if camera_id == 2:
+                    self.roi = [400, 1300, 1650, 2550]
+                    self.roi_cols = (self.roi[2], self.roi[3])
+                    self.roi_rows = (self.roi[0], self.roi[1])
+
+                seg_frame = frame.colRange(self.roi_cols[0], self.roi_cols[1]).rowRange(self.roi_rows[0],
+                                                                                        self.roi_rows[1])
                 # cv2.imwrite(f'./1/{time.time()}.jpg', seg_frame)
                 # print("ImageProcessRecognize", camera_id, self.original_queue.qsize(), "/n")
                 self.count += 1
@@ -273,10 +311,12 @@ class ImageProcessRecognize(Process):
                     thread1.start()
                     thread1.join()
                     result = thread1.get_result()
+                    frame = frame.download()[:, :, :3]
                     self.result_queue.put((camera_id, result, frame))
                     self.count = 0
                 else:
                     if camera_id != 1:
+                        frame = frame.download()[:, :, :3]
                         self.result_queue.put((camera_id, "NO", frame))
 
                 if self.count_top % 3 == 0 and camera_id == 1:
@@ -284,6 +324,7 @@ class ImageProcessRecognize(Process):
                     thread1.start()
                     thread1.join()
                     result = thread1.get_result()
+                    frame = frame.download()[:, :, :3]
                     self.result_queue.put((camera_id, result, frame))
                     self.count_top = 0
 
@@ -384,7 +425,7 @@ class ImageProcessWorker2(QThread):
                     self.my_container_detect.max_area_dict.clear()
                     # self.my_container_detect.res_dict.clear()
                     res_dict_lst.clear()
-                # time.sleep(0.0001)
+                # time.sleep(0.001)
                 # print(f"{self.direction}的总体时间为:{time.time() - start_time}")
             # except Exception as error:
             #     print(f"ImageProcessWorker2--{self.direction}:error:{error}")
@@ -654,10 +695,15 @@ class MainWindow(QMainWindow):
         self.original_queues = [Queue() for _ in range(len(self.camera_config))]
         self.result_queues = [Queue() for _ in range(len(self.camera_config))]
 
-        self.image_process_workers = [ImageProcessWorker(camera_info, result_queues, self.ocr_queue) for
-                                      camera_info, result_queues
+        # self.image_process_workers = [ImageProcessWorker(camera_info, result_queues, self.ocr_queue) for
+        #                               camera_info, result_queues
+        #                               in
+        #                               zip(list(self.camera_config.values())[:3], self.result_queues[:3])]
+
+        self.image_process_workers = [ImageProcessWorker(camera_info, original_queues, self.ocr_queue) for
+                                      camera_info, original_queues
                                       in
-                                      zip(list(self.camera_config.values())[:3], self.result_queues[:3])]
+                                      zip(list(self.camera_config.values())[:3], self.original_queues[:3])]
 
         for worker in self.image_process_workers:
             worker.image_processed.connect(self.handle_image_processed)
@@ -672,9 +718,9 @@ class MainWindow(QMainWindow):
             worker.image_processed.connect(self.handle_image_processed)
             worker.dataQueued.connect(self.update_label_2)
 
-        self.recognize_processes = [ImageProcessRecognize(original_queues, result_queues) for
-                                    original_queues, result_queues in
-                                    zip(self.original_queues[:3], self.result_queues[:3])]
+        # self.recognize_processes = [ImageProcessRecognize(original_queues, result_queues) for
+        #                             original_queues, result_queues in
+        #                             zip(self.original_queues[:3], self.result_queues[:3])]
 
         self.capture_processes = [ImageCaptureProcess(camera_info, original_queues) for camera_info, original_queues in
                                   zip(self.camera_config.values(), self.original_queues)]
@@ -694,8 +740,8 @@ class MainWindow(QMainWindow):
         for worker in self.additional_image_workers:
             worker.start()
 
-        for recognize in self.recognize_processes:
-            recognize.start()
+        # for recognize in self.recognize_processes:
+        #     recognize.start()
 
         time.sleep(5)
 
