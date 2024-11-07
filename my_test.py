@@ -1,6 +1,5 @@
 import json
 import os
-
 os.add_dll_directory(r"C:/opencv-4.9.0/build/install/x64/vc16/bin")
 os.add_dll_directory(r"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.8/bin")
 import cv2
@@ -32,9 +31,6 @@ weights_dict = {
     "ocr_rec_config": "./config_car/rec/my_rec_chinese_lite_train_v2.0.yml"
 }
 lp = det_ocr_car.OCR_process(weights_dict)
-
-
-
 
 
 

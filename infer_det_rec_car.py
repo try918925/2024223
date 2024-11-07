@@ -9,6 +9,7 @@ import sys
 import json
 # from  numba import cuda
 import psutil
+
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
 sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '..')))
@@ -29,8 +30,8 @@ import yaml
 from collections import Counter
 from itertools import zip_longest
 
+
 def draw_det_res(dt_boxes, config, img, img_name, save_path):
-    
     src_im = img
     for box in dt_boxes:
         box = np.array(box).astype(np.int32).reshape((-1, 1, 2))
@@ -39,6 +40,7 @@ def draw_det_res(dt_boxes, config, img, img_name, save_path):
         os.makedirs(save_path)
     save_path = os.path.join(save_path, os.path.basename(img_name))
     cv2.imwrite(save_path, src_im)
+
 
 def load_config(file_path):
     """
@@ -51,6 +53,7 @@ def load_config(file_path):
     assert ext in ['.yml', '.yaml'], "only support yaml files for now"
     config = yaml.load(open(file_path, 'rb'), Loader=yaml.Loader)
     return config
+
 
 def merge_config(config, opts):
     """
@@ -68,7 +71,7 @@ def merge_config(config, opts):
         else:
             sub_keys = key.split('.')
             assert (
-                sub_keys[0] in config
+                    sub_keys[0] in config
             ), "the sub_keys can only be one of global_config: {}, but get: " \
                "{}, please check your running command".format(
                 config.keys(), sub_keys[0])
@@ -80,12 +83,13 @@ def merge_config(config, opts):
                     cur = cur[sub_key]
     return config
 
+
 class Detection:
     def __init__(self, config_path):
         # self.config, self.device, self.logger, self.vdl_writer = self.program.preprocess()
         self.config = load_config(config_path)
         self.global_config = self.config['Global']
-    
+
     def load_checkpoint(self):
         self.model = build_model(self.config['Architecture'])
 
@@ -102,7 +106,7 @@ class Detection:
             self.transforms.append(op)
         self.ops = create_operators(self.transforms, self.global_config)
         self.model.eval()
-    
+
     def _predict2box(self, img):
         data = {'image': img}
         batch = transform(data, self.ops)
@@ -114,13 +118,12 @@ class Detection:
         post_result, score = self.post_process_class(preds, shape_list)
         boxes = post_result[0]['points']
         return boxes, score
-            
-            
+
     def predict(self, img_list):
         img_box = []
         box_scores = []
         for img_data in img_list:
-            h,w = img_data.shape[:2]
+            h, w = img_data.shape[:2]
             _, encoded_image = cv2.imencode(".jpg", img_data)
             img = encoded_image.tobytes()
             box, score = self._predict2box(img)
@@ -128,31 +131,32 @@ class Detection:
             box_scores.append(score)
         return img_box, box_scores
 
+
 class OCR_rec:
     def __init__(self, config_path):
         # self.config, self.device, self.logger, self.vdl_writer = self.program.preprocess()
         self.config = load_config(config_path)
         self.global_config = self.config['Global']
-    
+
     def load_checkpoint(self):
         # build post process
         self.post_process_class = build_post_process(self.config['PostProcess'],
-                                                self.global_config)
+                                                     self.global_config)
 
         # build model
         if hasattr(self.post_process_class, 'character'):
             char_num = len(getattr(self.post_process_class, 'character'))
             if self.config["Architecture"]["algorithm"] in ["Distillation",
-                                                    ]:  # distillation model
+                                                            ]:  # distillation model
                 for key in self.config["Architecture"]["Models"]:
                     if self.config["Architecture"]["Models"][key]["Head"][
-                            "name"] == 'MultiHead':  # multi head
+                        "name"] == 'MultiHead':  # multi head
                         out_channels_list = {}
                         if self.config['PostProcess'][
-                                'name'] == 'DistillationSARLabelDecode':
+                            'name'] == 'DistillationSARLabelDecode':
                             char_num = char_num - 2
                         if self.config['PostProcess'][
-                                'name'] == 'DistillationNRTRLabelDecode':
+                            'name'] == 'DistillationNRTRLabelDecode':
                             char_num = char_num - 3
                         out_channels_list['CTCLabelDecode'] = char_num
                         out_channels_list['SARLabelDecode'] = char_num + 2
@@ -163,7 +167,7 @@ class OCR_rec:
                         self.config["Architecture"]["Models"][key]["Head"][
                             "out_channels"] = char_num
             elif self.config['Architecture']['Head'][
-                    'name'] == 'MultiHead':  # multi head
+                'name'] == 'MultiHead':  # multi head
                 out_channels_list = {}
                 char_num = len(getattr(self.post_process_class, 'character'))
                 if self.config['PostProcess']['name'] == 'SARLabelDecode':
@@ -206,16 +210,16 @@ class OCR_rec:
         self.global_config['infer_mode'] = True
         self.ops = create_operators(self.transforms, self.global_config)
         self.model.eval()
-    
+
     def predict(self, img_list):
-        for img_data in img_list:   #get_image_file_list(img_path):
+        for img_data in img_list:  # get_image_file_list(img_path):
             try:
                 _, encoded_image = cv2.imencode(".jpg", img_data)
             except:
                 # print(len(img_data))
                 # print(img_data)
                 continue
-            img = encoded_image.tobytes() 
+            img = encoded_image.tobytes()
             data = {'image': img}
             batch = transform(data, self.ops)
             if self.config['Architecture']['algorithm'] == "SRN":
@@ -279,7 +283,11 @@ class OCR_rec:
             # if info is not None:
             #     print(info)
             yield info
-import uuid   
+
+
+import uuid
+
+
 class OCR_process(object):
     def __init__(self, config_dict):
         # 文本检测
@@ -291,13 +299,11 @@ class OCR_process(object):
         # # 竖直方向文本识别
         # self.ocr_v_rec = OCR_rec(config_dict["ocr_v_rec_config"])
         # self.ocr_v_rec.load_checkpoint()        
-        
+
         self.ocr_rec = OCR_rec(config_dict["ocr_rec_config"])
-        self.ocr_rec.load_checkpoint() 
+        self.ocr_rec.load_checkpoint()
         self.debug_show = True
-    
-    
-    
+
     def test_per_img(self, img):
         flag, crop_img_list, result_list = False, [], []
         # result_list [[container_id_1, iso_num_1], [, ]] 
@@ -309,20 +315,20 @@ class OCR_process(object):
                 y1 = box[0][1]
                 x2 = box[2][0]
                 y2 = box[2][1]
-                crop_img = img[y1 : y2, x1 : x2]
-                if (y2 - y1)  > (x2 - x1):
+                crop_img = img[y1: y2, x1: x2]
+                if (y2 - y1) > (x2 - x1):
                     crop_img = cv2.rotate(crop_img, cv2.ROTATE_90_COUNTERCLOCKWISE)
                 crop_img_list.append(crop_img)
-           
+
             info_stream = self.ocr_rec.predict(crop_img_list)
-            for info in info_stream:          
+            for info in info_stream:
                 ocr_str, score_str = info.split("\t")
                 result_list.append([ocr_str, score_str])
-          
+
             if self.debug_show:
-                
+
                 import copy
-                img_debug = copy.deepcopy(img) 
+                img_debug = copy.deepcopy(img)
                 if len(result_list) > 0:
                     for i, result in enumerate(result_list):
                         x1, y1 = boxes[0][i][0][0], boxes[0][i][0][1]
@@ -330,22 +336,23 @@ class OCR_process(object):
                         ocr_str = result[0]
                         score_str = result[1]
                         img_debug = cv2.rectangle(img_debug, (x1, y1), (x2, y2), (128, 128, 0), 2)
-                        img_debug = cv2.putText(img_debug, ocr_str+" : "+score_str[:4], (x2, y2), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (128, 128, 0), 2)
+                        img_debug = cv2.putText(img_debug, ocr_str + " : " + score_str[:4], (x2, y2), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (128, 128, 0), 2)
                     cv2.imwrite(f"{uuid.uuid1()}.jpg", img_debug)
 
         return flag, result_list
-    
+
     def sort_boxes(self, boxes):
-    # 定义排序规则的函数
+        # 定义排序规则的函数
         def box_sort_key(box):
             return (box[0][1], box[0][0])  # 先按照y，再按照x
+
         sorted_boxes = sorted(boxes, key=box_sort_key)
         return sorted_boxes
-    
+
     def clearbox(self, boxes):
         newbox = []
         for box in boxes:
-            if len(box)==0:
+            if len(box) == 0:
                 continue
             for i in box:
                 newbox.append(i.tolist())
@@ -378,32 +385,33 @@ class OCR_process(object):
                 # if (y2 - y1)  > (x2 - x1):
                 #     crop_img = cv2.rotate(crop_img, cv2.ROTATE_90_COUNTERCLOCKWISE)
                 crop_img_list.append(crop_img)
-            
+
             info_stream = self.ocr_rec.predict(crop_img_list)
             # fflag =False
-            for info in info_stream:     
+            for info in info_stream:
                 ocr_str, score_str = info.split("\t")
                 score = float(score_str)
-                if(score < 0.5 or len(ocr_str) != 7):
+                if (score < 0.5 or len(ocr_str) != 7):
                     continue
                 else:
                     if ocr_str[1].isalpha() and len(ocr_str) == 7:
                         result_list.append([ocr_str, score_det])
-            
+
             # final_result = getstr(result_list)
         if len(result_list) > 0:
             return result_list[0]
         else:
             return result_list
-    
+
+
 def getstr(strlist):
     transposed_data = list(zip_longest(*strlist, fillvalue=''))
-    if(len(transposed_data)==0):
+    if (len(transposed_data) == 0):
         return ''
     tp = transposed_data[-1]
-    if('' in tp):
+    if ('' in tp):
         # tp = transposed_data[-1]
-        max_ele = Counter(tp).most_common(2) #对最后一行空值进行修改
+        max_ele = Counter(tp).most_common(2)  # 对最后一行空值进行修改
         if '' not in max_ele[0][0]:
             elemm = max_ele[0][0]
         else:
@@ -412,10 +420,10 @@ def getstr(strlist):
         elemm = Counter(tp).most_common(1)[0][0]
     transposed_data = transposed_data[:-1]
     # transposed_data = transposed_data.append(tp)
-        # print(transposed_data)
+    # print(transposed_data)
     result = [Counter(column).most_common(1)[0][0] for column in transposed_data]
     result.append(elemm)
-    final_result1 = ''.join(result) 
+    final_result1 = ''.join(result)
     return final_result1
 
 
@@ -426,7 +434,7 @@ def selectSave(threshLst):
         return max_index
     else:
         return 0
-    
+
 
 def get_finalResult(result_lst):
     tmp_thresh_lst = []
@@ -441,20 +449,12 @@ def get_finalResult(result_lst):
             tmp_thresh_lst.append(0)
     if len(tmp_thresh_lst) > 0:
         idx = tmp_thresh_lst.index(max(tmp_thresh_lst))
-    if(len(result_lst)>3):
+    if (len(result_lst) > 3):
         tmp_result_list = sorted(result_lst, key=lambda x: x[0][1], reverse=True)[:3]
         tmp_result = [item[0][0] for item in tmp_result_list]
     final_result = getstr(tmp_result)
 
     return final_result, idx
-
-
-
-
-
-
-
-
 
 
 # from pympler import asizeof
@@ -472,7 +472,7 @@ if __name__ == "__main__":
     my_ocr_process = OCR_process(config_dict)
 
     img_list_path = [r'C:\Users\Install\Desktop\2024223\result\01\240430\CAR0267\Transfer\chepai.jpg']
-    
+
     result_lst = []
     save_frame = []
     thres_lst = []
@@ -490,15 +490,9 @@ if __name__ == "__main__":
     # saveIdx = selectSave(thres_lst)
     # print(getstr(result_lst))
 
-    
-    
-
     # for ip in img_list_path:
     #     img_list =[]
     #     img = cv2.imread(ip)
     #     img_list.append(img)
     #     result = my_ocr_process.process_imgs(img_list)
     #     print(f'车牌：{result[0]}', f'检测框置信度：{result[1][0]}')
-
-    
-
