@@ -19,7 +19,7 @@ Usage - formats:
                                  yolov5s.torchscript        # TorchScript
                                  yolov5s.onnx               # ONNX Runtime or OpenCV DNN with --dnn
                                  yolov5s_openvino_model     # OpenVINO
-                                 yolov5s.engine             # TensorRT
+                                 truck.engine             # TensorRT
                                  yolov5s.mlmodel            # CoreML (macOS-only)
                                  yolov5s_saved_model        # TensorFlow SavedModel
                                  yolov5s.pb                 # TensorFlow GraphDef

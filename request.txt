@@ -2,48 +2,39 @@ altgraph==0.17.4
 anyio==4.2.0
 appdirs==1.4.4
 astor==0.8.1
-asttokens==2.4.1
-av==13.1.0
 certifi==2024.2.2
+cffi==1.17.1
 charset-normalizer==3.3.2
-cmake==3.25.0
 colorama==0.4.6
-coloredlogs==15.0.1
 contourpy==1.2.0
 cycler==0.12.1
 decorator==5.1.1
-dill==0.3.9
 exceptiongroup==1.2.0
-executing==2.1.0
 ffmpeg-python==0.2.0
 filelock==3.9.0
-flatbuffers==24.3.25
 fonttools==4.49.0
 fsspec==2023.4.0
 future==0.18.3
 GPUtil==1.4.0
-graphsurgeon @ file:///C:/TensorRT-8.6.1.6/graphsurgeon/graphsurgeon-0.4.6-py2.py3-none-any.whl#sha256=0fbadaefbbe6e9920b9f814ae961c4a279be602812edf3ed7fb9cc6f8f4809fe
 h11==0.14.0
 httpcore==1.0.2
 httpx==0.26.0
-humanfriendly==10.0
 idna==3.6
 imageio==2.33.1
+install==1.3.5
 intel-openmp==2021.4.0
-ipython==8.28.0
-jedi==0.19.1
 Jinja2==3.1.2
 kiwisolver==1.4.5
 lazy_loader==0.3
+llvmlite==0.43.0
 lmdb==1.4.1
 Mako==1.3.2
 MarkupSafe==2.1.5
 matplotlib==3.8.2
-matplotlib-inline==0.1.7
 mkl==2021.4.0
 mpmath==1.3.0
-mss==9.0.2
 networkx==3.2.1
+numba==0.60.0
 numpy==1.26.4
 nvidia-cublas-cu11==11.11.3.6
 nvidia-cuda-cupti-cu11==11.8.87
@@ -55,42 +46,32 @@ nvidia-curand-cu11==10.3.0.86
 nvidia-cusolver-cu11==11.4.1.48
 nvidia-cusparse-cu11==11.7.5.86
 nvidia-nvtx-cu11==11.8.86
-nvidia-pyindex==1.0.9
 onnx==1.15.0
-onnx-graphsurgeon @ file:///C:/TensorRT-8.6.1.6/onnx_graphsurgeon/onnx_graphsurgeon-0.3.12-py2.py3-none-any.whl#sha256=1ded3e1c4d6d9870f1974c89e1f8aa0ef72c3489bbd9762ac9a5b1b64eb15678
-onnxruntime==1.19.2
 opencv-python==4.10.0.84
-openvino==2024.4.0
-openvino-telemetry==2024.1.0
 opt-einsum==3.3.0
 packaging==24.1
 paddle-bfloat==0.1.7
 paddlepaddle-gpu==2.4.2.post117
 pandas==2.2.2
-parso==0.8.4
 pefile==2023.2.7
 pillow==10.2.0
 platformdirs==4.2.0
-prompt_toolkit==3.0.48
 protobuf==3.20.0
 psutil==5.9.8
-pure_eval==0.2.3
 py-cpuinfo==9.0.0
-pybind11==2.13.6
 pyclipper==1.3.0.post5
-pycocotools==2.0.8
+pycparser==2.22
 pycuda==2024.1
-Pygments==2.18.0
 pyinstall==0.1.4
 pyinstaller==6.3.0
 pyinstaller-hooks-contrib==2024.0
 pyparsing==3.1.1
-pyreadline3==3.5.4
 PySide6==6.6.1
 PySide6-Addons==6.6.1
 PySide6-Essentials==6.6.1
-python-dateutil==2.9.0.post0
-pytools==2024.1.14
+PySoundFile==0.9.0.post1
+python-dateutil==2.8.2
+pytools==2023.1.1
 pytz==2024.1
 pywin32==306
 pywin32-ctypes==0.2.2
@@ -100,28 +81,24 @@ requests==2.31.0
 scikit-image==0.22.0
 scipy==1.12.0
 seaborn==0.13.2
-# Editable install with no version control (segment_anything==1.0)
--e c:\users\hello\desktop\segment-anything-main
 shapely==2.0.2
 shiboken6==6.6.1
 six==1.16.0
 sniffio==1.3.0
-stack-data==0.6.3
+soundfile==0.12.1
 sympy==1.12
 tbb==2021.13.0
-tensorrt @ file:///C:/TensorRT-8.6.1.6/python/tensorrt-8.6.0-cp310-none-win_amd64.whl#sha256=84565a46aa68279c415b5510cac2d66f51b5db9b3d782e537032f2771c16d675
+tensorrt @ file:///C:/Users/Install/Desktop/2024223/tensorrt-8.6.0-cp310-none-win_amd64.whl#sha256=84565a46aa68279c415b5510cac2d66f51b5db9b3d782e537032f2771c16d675
 thop==0.1.1.post2209072238
 tifffile==2024.7.2
-torch @ file:///C:/2024223/2024223/torch-1.13.1%2Bcu117-cp310-cp310-win_amd64.whl#sha256=978239684c6ec455ad2157ff33d44fdb9dd8d3a93b9d2f4ac7aa57691e990136
-torchaudio @ file:///C:/2024223/2024223/torchaudio-0.13.1%2Bcu117-cp310-cp310-win_amd64.whl#sha256=2d821e7da413b193ed9acf59c9a4d2ae8704df4c6ff722da0fee77f569b11703
-torchvision @ file:///C:/2024223/2024223/torchvision-0.14.1%2Bcu117-cp310-cp310-win_amd64.whl#sha256=b39fc67e7131053d435804d7901e88528611c0832fd9f1cc26476b5a27cc5d81
+torch @ file:///C:/Users/Install/Desktop/2024223/torch-1.13.1%2Bcu117-cp310-cp310-win_amd64.whl#sha256=978239684c6ec455ad2157ff33d44fdb9dd8d3a93b9d2f4ac7aa57691e990136
+torchaudio @ file:///C:/Users/Install/Desktop/2024223/torchaudio-0.13.1%2Bcu117-cp310-cp310-win_amd64.whl#sha256=2d821e7da413b193ed9acf59c9a4d2ae8704df4c6ff722da0fee77f569b11703
+torchvision @ file:///C:/Users/Install/Desktop/2024223/torchvision-0.14.1%2Bcu117-cp310-cp310-win_amd64.whl#sha256=b39fc67e7131053d435804d7901e88528611c0832fd9f1cc26476b5a27cc5d81
 tqdm==4.66.4
-traitlets==5.14.3
 typing_extensions==4.12.2
 tzdata==2024.1
 ultralytics==8.2.52
 ultralytics-thop==2.0.0
 urllib3==2.2.2
-wcwidth==0.2.13
 winshell==0.6
 zmq==0.0.0

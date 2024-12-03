@@ -11,7 +11,6 @@ from PySide6.QtWidgets import *
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from uuu import Ui_MainWindow
-import threading
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Queue, Process, freeze_support
 import test_infer as trt_infer
@@ -19,13 +18,10 @@ import infer_det_rec as det_ocr
 import infer_det_rec_car as det_ocr_car
 import stichImg as ts
 from algorithms.detector import YOLOv5Detector
-from yolov5.detector import YOLOv5Detector as doorDetector
-import Container_det as cont_trt_infer
-# import Container_det_trt_yolov5 as cont_trt_infer
+import Container_det_trt_yolov5 as cont_trt_infer
 import time, glob, socket, zmq
 from datetime import datetime
 from configs import config_5s_trt as my_config
-from configs import config_5s_trt_door as door_config
 import copy
 
 xiangti = ''
@@ -48,17 +44,15 @@ class ImageCaptureProcess(Process):
         self.counter = 0
 
     def run(self):
-        # count = 0
-        # start_time = time.time()
+        count = 0
+        start_time = time.time()
         try:
             decoder = cv2.cudacodec.createVideoReader(self.file_path)
             while True:
-
-                # if self.direction in ("front", "rear", "top"):
-                #     time.sleep(0.07)
-                # else:
-                #     time.sleep(0.03)
-
+                if self.direction in self.left_right:
+                    time.sleep(0.03)
+                else:
+                    time.sleep(0.065)
                 ret, frame = decoder.nextFrame()
                 if not ret or frame is None:
                     self.counter += 1
@@ -267,15 +261,15 @@ class ImageProcessWorker2(QThread):
         self.initialize_inference()
 
     def initialize_inference(self):
-        # PLUGIN_LIBRARY = "./myplugins.dll"
-        # engine_file_path = "truck.engine"
-        # ctypes.CDLL(PLUGIN_LIBRARY)
-        self.csd_detector = doorDetector.from_config(door_config)
+        PLUGIN_LIBRARY = "./myplugins.dll"
+        engine_file_path = "truck.engine"
+        ctypes.CDLL(PLUGIN_LIBRARY)
+        self.csd_detector = cont_trt_infer.CSD_Detector(engine_file_path)  # 初始化detector
         self.my_container_detect = cont_trt_infer.container_detect(self.csd_detector)
 
     def delete_old_files(self):
         try:
-            # 获取tmp文件夹下的所有文件            # files = glob.glob('tmp/*')
+            # 获取tmp文件夹下的所有文件
             files = os.listdir('./tmp')
             # 如果文件数量大于1，则表示有旧文件需要删除
             for file in files:
@@ -291,19 +285,20 @@ class ImageProcessWorker2(QThread):
             if not self.queue.empty():
                 self.camera_id, frame = self.queue.get()
                 self.frame_counter += 1
-                # rec队列采集 front==0
                 if self.camera_id == 0:
-                    if self.frame_counter == 4:
+                    if self.frame_counter == 3:
                         self.rec_queue.put((self.camera_id, frame))
                         self.frame_counter = 0
                 # suanfa_time = time.time()
                 self.my_container_detect.process_frame(frame)
-                reuslt_dict = self.my_container_detect.get_result()
+                _, reuslt_dict = self.my_container_detect.get_result()
                 if reuslt_dict:
+                    # if self.camera_id == 0:
+                    #     cv2.imwrite(f"./Automatic_Clip_Video/test_frame/{time.time()}.jpg", frame)
                     res_dict_lst.append(reuslt_dict)
                 if self.my_container_detect.non_truck > 10 and self.my_container_detect.new_truck:
                     # 当连续12帧(约1s)没有集装箱面，且之前有卡车进入时，获取前一段时间面积最大帧
-                    reuslt_dict = self.my_container_detect.get_result()
+                    reuslt_dict, _ = self.my_container_detect.get_result()
                     self.executor.submit(self.clear_writer_img, self.camera_id, reuslt_dict['img'])
                     # ocr队列采集
                     self.ocr_queue.put(((self.camera_id + 6), reuslt_dict['img']))
@@ -317,15 +312,13 @@ class ImageProcessWorker2(QThread):
                         self.ocr_queue.put((5, None))
                     self.my_container_detect.new_truck = False
                     self.my_container_detect.max_area_dict.clear()
-                    # self.my_container_detect.res_dict.clear()
+                    self.my_container_detect.res_dict.clear()
                     res_dict_lst.clear()
-                # print(f"ImageProcessWorker2:{self.direction}:{self.queue.qsize()}")
 
     def clear_writer_img(self, camera_id, frame):
         file_path = f'tmp/{camera_id + 3}.jpg'
         if camera_id == 0:
-            # self.delete_old_files()
-            pass
+            self.delete_old_files()
         cv2.imwrite(file_path, frame)
 
     def dataQueued_show(self, camera_id, frame):
@@ -478,7 +471,6 @@ class OcrThread(QThread):
                 ocr_data_dict["rear"] = "箱门朝后"
                 self.ocrMessage.emit(1, "箱门朝后")
             if id != 5:
-                start_time = time.time()
                 if id == 0:
                     result = self.ocr.process_imgs([frame], "left")
                 if id == 2:
@@ -498,20 +490,15 @@ class OcrThread(QThread):
                         result_list.append((result1, ''))
                     elif result1 == '' and result2 != '':
                         result_list.append(('', result2))
-                # print(f"OcrThread:{time.time() - start_time}")
 
             if id == 5:
-                start_time = time.time()
                 ultra_result_one = det_ocr.vote2res(result_list)
-                print(f"ultra_result_one:{time.time() - start_time}")
                 result_list = []
                 # self.write_ocr_data(ultra_result_one, copy.deepcopy(ocr_data_dict))
-                if ultra_result_one:
-                    self.executor.submit(self.write_ocr_data, ultra_result_one, copy.deepcopy(ocr_data_dict))
-                    self.ocrMessage.emit(1, ultra_result_one)
+                self.executor.submit(self.write_ocr_data, ultra_result_one, copy.deepcopy(ocr_data_dict))
+                self.ocrMessage.emit(1, ultra_result_one)
                 ocr_data_dict = {"front": "", "rear": ""}
             # print(f"OcrThread:{self.queue.qsize()}")
-
             time.sleep(0.001)
 
     def write_ocr_data(self, ultra_result, ocr_data_dict):
@@ -547,29 +534,26 @@ class RecThread(QThread):
         save_frame = []
 
         while True:
+            start_time = time.time()
             id, frame = self.queue.get()
             if id != 5:
-                start_time = time.time()
                 use_frame = cv2.GaussianBlur(frame, (5, 5), 0)
                 result = self.lp.process_imgs([use_frame])
-                print("result_list__________!:", result)
-                if result:
-                    print("result_list_______@:", result)
+                if len(result) > 0:
                     result_list.append([result, frame])
                     save_frame.append(frame)
-                # print(f"RecThread:{time.time() - start_time}")
+                    print(f"R11111111ecThread:{frame} \n")
 
             if id == 5:
-                start_time = time.time()
                 ultra_result, save_frame_idx = det_ocr_car.get_finalResult(result_list)
-                if save_frame:
+                if len(save_frame) > 0:
                     final_save = save_frame[save_frame_idx]
-                    self.executor.submit(self.writer_img, 'tmp1/chepai.jpg', final_save)
-                    self.recMessage.emit(1, ultra_result)
-                    save_frame.clear()
-                    result_list.clear()
-                    # print(f"ultra_result, save_frame_idx:{time.time() - start_time}")
-                    self.executor.submit(self.writer_rec_data, ultra_result)
+                    self.executor.submit(self.writer_img, 'tmp/chepai.jpg', final_save)
+                result_list = []
+                save_frame = []
+                self.executor.submit(self.writer_rec_data, ultra_result)
+            print(f"RecThread:ultra_result, save_frame_idx:{self.queue.qsize()}  时间:{time.time() - start_time} \n")
+            time.sleep(0.001)
 
     def record_reccar(self, ultra_result):
         with open("0611-001-reccar.txt", "a") as fw:
@@ -578,6 +562,7 @@ class RecThread(QThread):
 
     def writer_rec_data(self, ultra_result):
         file_path = 'tmp/rec.txt'
+        self.recMessage.emit(1, ultra_result)
         with open(file_path, 'w', encoding='utf-8') as file:
             file.write(ultra_result)
 

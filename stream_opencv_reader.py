@@ -18,6 +18,7 @@ class stream_opencv_reader(object):
             self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, resolution[1])
         elif source_type == 'file':
             source_fps = int(self.capture.get(cv2.CAP_PROP_FPS))
+            print(f"source_fps: {source_fps}")
             self.frame_intervals = np.zeros(source_fps, dtype=int)
             interval = source_fps / fps
             for i in range(fps):

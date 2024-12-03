@@ -320,7 +320,7 @@ class ImageProcessWorker2(QThread):
 
     def initialize_inference(self):
         PLUGIN_LIBRARY = "./myplugins.dll"
-        # engine_file_path = "truck.engine"
+        # engine_file_path = "truck_old.engine"
         # ctypes.CDLL(PLUGIN_LIBRARY)
         # self.csd_detector = cont_trt_infer.CSD_Detector(engine_file_path)# 初始化detector
         self.csd_detector = YOLOv5Detector.from_config(door_config)

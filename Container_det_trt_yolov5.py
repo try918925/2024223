@@ -18,7 +18,7 @@ from collections import Counter
 import warnings
 warnings.filterwarnings("ignore")
 
-CONF_THRESH = 0.91  # 检测置信度
+CONF_THRESH = 0.93  # 检测置信度
 IOU_THRESHOLD = 0.4
 LEN_ONE_RESULT = 38
 
@@ -335,7 +335,7 @@ class container_detect(object):
 if __name__ == "__main__":
     # 加载插件和预训练模型
     PLUGIN_LIBRARY = "./myplugins.dll"
-    engine_file_path = "truck.engine"
+    engine_file_path = "truck_old.engine"
 
     ctypes.CDLL(PLUGIN_LIBRARY)
 

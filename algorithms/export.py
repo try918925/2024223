@@ -12,7 +12,7 @@ PyTorch                     | -                             | yolov5s.pt
 TorchScript                 | `torchscript`                 | yolov5s.torchscript
 ONNX                        | `onnx`                        | yolov5s.onnx
 OpenVINO                    | `openvino`                    | yolov5s_openvino_model/
-TensorRT                    | `engine`                      | yolov5s.engine
+TensorRT                    | `engine`                      | truck.engine
 CoreML                      | `coreml`                      | yolov5s.mlmodel
 TensorFlow SavedModel       | `saved_model`                 | yolov5s_saved_model/
 TensorFlow GraphDef         | `pb`                          | yolov5s.pb
@@ -33,7 +33,7 @@ Inference:
                                  yolov5s.torchscript        # TorchScript
                                  yolov5s.onnx               # ONNX Runtime or OpenCV DNN with --dnn
                                  yolov5s_openvino_model     # OpenVINO
-                                 yolov5s.engine             # TensorRT
+                                 truck.engine             # TensorRT
                                  yolov5s.mlmodel            # CoreML (macOS-only)
                                  yolov5s_saved_model        # TensorFlow SavedModel
                                  yolov5s.pb                 # TensorFlow GraphDef

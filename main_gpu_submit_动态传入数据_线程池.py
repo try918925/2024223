@@ -26,15 +26,6 @@ from configs import config_5s_trt as my_config
 from configs import config_5s_trt_door as door_config
 import copy
 
-# import psutil,GPUtil
-#
-#
-# gpus = GPUtil.getGPUs()
-# cpu_usage = psutil.cpu_percent(interval=1)11
-# memory_info = psutil.virtual_memory()
-# def get_gpu_info():
-#     print(f"GPU显存使用: {gpus[0].memoryUsed}MB / {gpus[0].memoryTotal}MB")
-#     print(f"cpu百分比:{cpu_usage},内存百分比占用:{memory_info.percent},")
 
 run_Flag = True
 xiangti = ''
@@ -305,7 +296,7 @@ class ImageProcessWorker2(QThread):
 
     def initialize_inference(self):
         PLUGIN_LIBRARY = "./myplugins.dll"
-        engine_file_path = "truck.engine"
+        engine_file_path = "truck_old.engine"
         ctypes.CDLL(PLUGIN_LIBRARY)
         self.csd_detector = YOLOv5Detector.from_config(door_config)
         self.my_container_detect = cont_trt_infer.container_detect(self.csd_detector)

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
 import os
-import threading
-
 os.add_dll_directory(r"C:/opencv-4.9.0/build/install/x64/vc16/bin")
 os.add_dll_directory(r"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.8/bin")
 import cv2
@@ -12,6 +10,7 @@ from PySide6.QtWidgets import *
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from uuu import Ui_MainWindow
+import threading
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Queue, Process, freeze_support
 import test_infer as trt_infer
@@ -19,13 +18,13 @@ import infer_det_rec as det_ocr
 import infer_det_rec_car as det_ocr_car
 import stichImg as ts
 from algorithms.detector import YOLOv5Detector
-import Container_det_trt_yolov5 as cont_trt_infer
+import Container_det as cont_trt_infer
+# import Container_det_trt_yolov5 as cont_trt_infer
 import time, glob, socket, zmq
 from datetime import datetime
 from configs import config_5s_trt as my_config
 from configs import config_5s_trt_door as door_config
 import copy
-import asyncio
 
 xiangti = ''
 
@@ -253,7 +252,7 @@ class ImageProcessWorker2(threading.Thread):
 
     def initialize_inference(self):
         PLUGIN_LIBRARY = "./myplugins.dll"
-        engine_file_path = "truck.engine"
+        engine_file_path = "truck_old.engine"
         ctypes.CDLL(PLUGIN_LIBRARY)
         self.csd_detector = YOLOv5Detector.from_config(door_config)
         self.my_container_detect = cont_trt_infer.container_detect(self.csd_detector)
