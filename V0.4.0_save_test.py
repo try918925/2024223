@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
-import os, zmq, socket
+import os, zmq, socket, sys
 import threading
 
-os.add_dll_directory(r"C:/opencv-4.9.0/build/install/x64/vc16/bin")
+os.add_dll_directory(r"C:/opencv_build_data/opencv-4.9.0/build/install/x64/vc16/bin")
 os.add_dll_directory(r"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.8/bin")
 import cv2
 import ctypes
@@ -24,8 +24,50 @@ import time
 from datetime import datetime
 from configs import config_5s_trt as my_config
 import copy
+from datetime import datetime
+import psutil
+import GPUtil
 
+now = datetime.now()
 xiangti = ''
+
+
+def camera_model_data(filed_name):
+    return {
+        "params_left": {
+            "file_path": f"C:/test_veodie/22fps/{filed_name}/left.mp4",
+            "roi": [400, 1300, 50, 950],
+            "id": 0,
+            "queue": "",
+            "direction": "left"
+        },
+        "params_right": {
+            "file_path": f"C:/test_veodie/22fps/{filed_name}/right.mp4",
+            "roi": [400, 1300, 1650, 2550],
+            "id": 2,
+            "queue": "",
+            "direction": "right"
+        },
+        "params_top": {
+            "file_path": f"C:/test_veodie/22fps/{filed_name}/top.mp4",
+            "roi": [250, 1350, 780, 1880],
+            "id": 1,
+            "queue": "",
+            "direction": "top"
+        },
+        "params_front": {
+            "file_path": f"C:/test_veodie/22fps/{filed_name}/front.mp4",
+            "roi": [450, 1440, 780, 1700],
+            "id": 0,
+            "direction": "front"
+        },
+        "params_rear": {
+            "file_path": f"C:/test_veodie/22fps/{filed_name}/rear.mp4",
+            "roi": [520, 1425, 480, 1790],
+            "id": 1,
+            "direction": "rear"
+        }
+    }
 
 
 class RightLeftCaptureProcess(Process):
@@ -104,7 +146,7 @@ class FrontRearCaptureProcess(threading.Thread):
         self.dsize = (900, 600)
         self.roi_cols = (self.roi[2], self.roi[3])
         self.roi_rows = (self.roi[0], self.roi[1])
-        self.sleep_time = camera_info['sleep_time']
+        self.sleep_time = sleep_time
         self.front_rear_count = 0
         self.counter = 0
 
@@ -458,10 +500,11 @@ class TopProcessWorker(threading.Thread):
 
 
 class ImageProcessRecognize(threading.Thread):
-    def __init__(self, original_queue, result_queue):
+    def __init__(self, original_queue, result_queue, log_queue):
         super().__init__()
         self.original_queue = original_queue
         self.result_queue = result_queue
+        self.log_queue = log_queue
         self.count = 0
         self.count_top = 0
         self.direction = {
@@ -504,7 +547,7 @@ class ImageProcessRecognize(threading.Thread):
                     if camera_id != 1:
                         frame = cv2.resize(frame, (2560, 1440))
                         self.result_queue.put((camera_id, "NO", frame))
-                if self.count_top % 5 == 0 and camera_id == 1:
+                if camera_id == 1:
                     start_time = time.time()
                     thread1 = self.trt_infer.inferThread(self.mobilenet_wrapper, [seg_frame])
                     thread1.start()
@@ -516,14 +559,16 @@ class ImageProcessRecognize(threading.Thread):
                     self.result_queue.put((camera_id, result, frame))
                     self.count_top = 0
 
-                if len(self.mean_data) >= 500:
+                if len(self.mean_data) >= 200:
                     print(f"{self.direction[camera_id]}:ImageProcessRecognize:队列长度为:{self.original_queue.qsize()}")
-                    print(f"ImageProcessRecognize识别无车时间:{np.mean(self.mean_data)}")
+                    self.log_queue.put(f"{self.direction[camera_id]}:ImageProcessRecognize:队列长度为:{self.original_queue.qsize()}")
+                    print(f"{self.direction[camera_id]}:ImageProcessRecognize识别无车时间:{np.mean(self.mean_data)}")
+                    self.log_queue.put(f"{self.direction[camera_id]}:ImageProcessRecognize识别无车时间:{np.mean(self.mean_data)}")
                     self.mean_data.clear()
 
 
 class ImageProcessWorker2(threading.Thread):
-    def __init__(self, camera_info, qu1, qu2, qu3, resource_queue):
+    def __init__(self, camera_info, qu1, qu2, qu3, resource_queue, log_queue):
         super().__init__()
         self.camera_id = camera_info['id']
         self.file_path = camera_info['file_path']
@@ -532,7 +577,9 @@ class ImageProcessWorker2(threading.Thread):
         self.queue = qu1
         self.rec_queue = qu2
         self.ocr_queue = qu3
+        self.ocr_queue = qu3
         self.resource_queue = resource_queue
+        self.log_queue = log_queue
         self.frame_counter = 0
         self.mean_data = []
 
@@ -578,7 +625,9 @@ class ImageProcessWorker2(threading.Thread):
 
                 if self.my_container_detect.non_truck > 8 and self.my_container_detect.new_truck:
                     print(f"{self.direction}:ImageProcessWorker2:队列长度为:{self.queue.qsize()}")
-                    print(f"ImageProcessWorker2有车来:{time.time() - start_time}")
+                    self.log_queue.put(f"{self.direction}:ImageProcessWorker2:队列长度为:{self.queue.qsize()}")
+                    print(f"{self.direction}:ImageProcessWorker2有车来:{time.time() - start_time}")
+                    self.log_queue.put(f"{self.direction}:ImageProcessWorker2有车来:{time.time() - start_time}")
                     # 当连续12帧(约1s)没有集装箱面，且之前有卡车进入时，获取前一段时间面积最大帧
                     reuslt_dict, _ = self.my_container_detect.get_result()
                     self.clear_writer_img(self.camera_id, reuslt_dict['img'])
@@ -597,8 +646,9 @@ class ImageProcessWorker2(threading.Thread):
                     self.my_container_detect.res_dict.clear()
                     res_dict_lst.clear()
 
-                if len(self.mean_data) >= 200:
-                    print(f"ImageProcessWorker2识别无车时间:{np.mean(self.mean_data)}")
+                if len(self.mean_data) >= 100:
+                    print(f"{self.direction}:ImageProcessWorker2识别无车时间:{np.mean(self.mean_data)}")
+                    self.log_queue.put(f"{self.direction}:ImageProcessWorker2识别无车时间:{np.mean(self.mean_data)}")
                     self.mean_data.clear()
 
     def clear_writer_img(self, camera_id, frame):
@@ -609,9 +659,10 @@ class ImageProcessWorker2(threading.Thread):
 
 
 class OcrThread(threading.Thread):
-    def __init__(self, queue, resource_queue):
+    def __init__(self, queue, resource_queue, log_queue):
         super().__init__()
         self.queue = queue
+        self.log_queue = log_queue
         self.resource_queue = resource_queue
         self.mean_data = []
 
@@ -658,28 +709,30 @@ class OcrThread(threading.Thread):
                         result_list.append(('', result2))
                 self.mean_data.append(time.time() - start_time)
 
-            if len(self.mean_data) >= 3:
+            if len(self.mean_data) >= 2:
                 print(f"OcrThread识别无车时间:{np.mean(self.mean_data)}")
+                self.log_queue.put(f"OcrThread识别无车时间:{np.mean(self.mean_data)}")
                 self.mean_data.clear()
 
             if id == 5:
-                start_time = time.time()
                 ultra_result_one = det_ocr.vote2res(result_list)
                 result_list = []
-                self.write_ocr_data(ultra_result_one, copy.deepcopy(ocr_data_dict))
                 self.resource_queue.put(("recognition", "Ocr", ultra_result_one))
+                self.write_ocr_data(ultra_result_one, copy.deepcopy(ocr_data_dict))
                 ocr_data_dict = {"front": "", "rear": ""}
                 print(f"OcrThread:队列长度为:{self.queue.qsize()}")
+                self.log_queue.put(f"OcrThread:队列长度为:{self.queue.qsize()}")
                 print(f"OcrThread有车识别时间:{time.time() - start_time}")
+                self.log_queue.put(f"OcrThread有车识别时间:{time.time() - start_time}")
 
             time.sleep(0.001)
 
     def write_ocr_data(self, ultra_result, ocr_data_dict):
         file_path = 'tmp/ocr.txt'
         # 写入结果到文件中
-        # print("准备写入数据orc:", ultra_result, ocr_data_dict)
         with open(file_path, 'w', encoding='utf-8') as file:
             ultra_result = ultra_result[:-4] + ' ' + ultra_result[-4:]
+            self.log_queue.put(f"箱号:{ultra_result}")
             file.write(ultra_result + '\n')
             if ocr_data_dict['front']:
                 file.write(ocr_data_dict['front'] + '\n')
@@ -688,10 +741,11 @@ class OcrThread(threading.Thread):
 
 
 class RecThread(threading.Thread):
-    def __init__(self, queue, resource_queue):
+    def __init__(self, queue, resource_queue, log_queue):
         super().__init__()
         self.queue = queue
         self.resource_queue = resource_queue
+        self.log_queue = log_queue
         self.cont_num = 1
         self.mean_data = []
         self.lp = None
@@ -717,8 +771,9 @@ class RecThread(threading.Thread):
                 # print(f"RecThread识别时间:{time.time() - start_time}")
                 self.mean_data.append(time.time() - start_time)
 
-            if len(self.mean_data) >= 200:
+            if len(self.mean_data) >= 20:
                 print(f"RecThread无车识别时间:{np.mean(self.mean_data)}")
+                self.log_queue.put(f"RecThread无车识别时间:{np.mean(self.mean_data)}")
                 self.mean_data.clear()
 
             # print(f"RecThread:use_frame  时间:{time.time() - start_time} \n")
@@ -728,16 +783,17 @@ class RecThread(threading.Thread):
                 ultra_result, save_frame_idx = det_ocr_car.get_finalResult(result_list)
                 if len(save_frame) > 0:
                     final_save = save_frame[save_frame_idx]
-                    # self.writer_img('tmp/chepai.jpg', final_save)
                     self.writer_img('tmp/chepai.jpg', final_save)
-                self.resource_queue.put(("recognition", "Rec", ultra_result))
+                self.recMessage.emit(1, ultra_result)
+                # self.record_reccar(ultra_result)
                 print(f"RecThread:队列长度为:{self.queue.qsize()}")
+                self.log_queue.put(f"RecThread:队列长度为:{self.queue.qsize()}")
                 print(f"RecThread有车识别时间:{time.time() - start_time}")
+                self.log_queue.put(f"RecThread有车识别时间:{time.time() - start_time}")
                 result_list = []
                 save_frame = []
-                # self.writer_rec_data(ultra_result)
                 self.writer_rec_data(ultra_result)
-            # print(f"RecThread:ultra_result, save_frame_idx:{self.queue.qsize()}  时间:{time.time() - start_time} \n")
+                self.log_queue.put(f"RecThread号:{ultra_result}")
             time.sleep(0.0001)
 
     def record_reccar(self, ultra_result):
@@ -778,7 +834,7 @@ class ComputationalResource(QThread):
 
 
 class SaveProcessWorker(QThread):
-    def __init__(self, path, channel):
+    def __init__(self, path, channel, log_queue):
         super().__init__()
         self.path = path
         self.ch = channel
@@ -792,6 +848,7 @@ class SaveProcessWorker(QThread):
         self.publisher.bind("tcp://*:5555")  # 本地绑定，使用端口5555
         self.files_to_check = ['top.jpg', 'left.jpg', 'right.jpg', 'rear.jpg', 'front.jpg', 'ocr.txt', 'rec.txt']
         self.not_send_files = ['ocr.txt', 'rec.txt']
+        self.log_queue = log_queue
 
     def rename_file(self, file_path, output_path):
         max_retries = 3
@@ -877,22 +934,22 @@ class SaveProcessWorker(QThread):
             start_time = time.time()
             if self.check_files_existence(folder_path):
                 self.check()
-                print('存档img... ')
                 print("保存数据时间:", time.time() - start_time)
+                self.log_queue.put(f"保存数据时间:{time.time() - start_time}")
             time.sleep(2)
 
 
-def rear_front_rec_ocr_one_process(camera_info, rec_queue, ocr_queue, resource_queue):
+def rear_front_rec_ocr_one_process(camera_info, rec_queue, ocr_queue, resource_queue, log_queue):
     thread_list = []
-    workers = [ImageProcessWorker2(camera_info, queue, rec_queue, ocr_queue, resource_queue) for camera_info, queue in camera_info]
+    workers = [ImageProcessWorker2(camera_info, queue, rec_queue, ocr_queue, resource_queue, log_queue) for camera_info, queue in camera_info]
     for worker in workers:
         thread_list.append(worker)
         worker.start()
-    rec_thread = RecThread(rec_queue, resource_queue)
+    rec_thread = RecThread(rec_queue, resource_queue, log_queue)
     thread_list.append(rec_thread)
     rec_thread.start()
 
-    ocr_thread = OcrThread(ocr_queue, resource_queue)
+    ocr_thread = OcrThread(ocr_queue, resource_queue, log_queue)
     thread_list.append(ocr_thread)
     ocr_thread.start()
 
@@ -900,9 +957,9 @@ def rear_front_rec_ocr_one_process(camera_info, rec_queue, ocr_queue, resource_q
         thread_data.join()
 
 
-def left_right_top_recognize_process(original_result_queue):
+def left_right_top_recognize_process(original_result_queue, log_queue):
     thread_list = []
-    recognizes = [ImageProcessRecognize(original_queues, result_queues) for original_queues, result_queues in original_result_queue]
+    recognizes = [ImageProcessRecognize(original_queues, result_queues, log_queue) for original_queues, result_queues in original_result_queue]
     for recognize in recognizes:
         thread_list.append(recognize)
         recognize.start()
@@ -915,18 +972,11 @@ def front_rear_capture_process(camera_info):
     thread_list = []
     for camera, original_queues in camera_info:
         if camera["direction"] in ["front", "rear"]:
-            process = FrontRearCaptureProcess(camera, original_queues, sleep_time=0.07)
+            process = FrontRearCaptureProcess(camera, original_queues, sleep_time=0.065)
             thread_list.append(process)
             process.start()
-    for thread_data in thread_list:
-        thread_data.join()
-
-
-def top_capture_process(camera_info):
-    thread_list = []
-    for camera, original_queues in camera_info:
         if camera["direction"] in ["top"]:
-            process = TopCaptureProcess(camera, original_queues, sleep_time=0.07)
+            process = TopCaptureProcess(camera, original_queues, sleep_time=0.065)
             thread_list.append(process)
             process.start()
 
@@ -952,7 +1002,7 @@ def top_left_worker_process(camera_info, ocr_queue, resource_queue):
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, filed_name, log_queue):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -969,16 +1019,16 @@ class MainWindow(QMainWindow):
             "right": self.ui.label_9,
         }
 
-        with open('camera_model.json', 'r') as f:
-            self.camera_config = json.load(f)
+        self.camera_config = camera_model_data(filed_name)
 
+        self.log_queue = log_queue
         self.ocr_queue = Queue()
         self.rec_queue = Queue()
         self.resource_queue = Queue()
 
-        self.path = "1108_save_test"
+        self.path = "2024_11_13_test_machine"
         self.channel = "01"
-        self.save_thread = SaveProcessWorker(self.path, self.channel)
+        self.save_thread = SaveProcessWorker(self.path, self.channel, self.log_queue)
 
         self.computational_resource = ComputationalResource(self.resource_queue)
         self.computational_resource.recocrylMessage.connect(self.update_rec_ocr_yl)
@@ -995,12 +1045,12 @@ class MainWindow(QMainWindow):
 
         self.additional_image_workers = Process(
             target=rear_front_rec_ocr_one_process,
-            args=(zip(list(self.camera_config.values())[3:], self.original_queues[3:]), self.rec_queue, self.ocr_queue, self.resource_queue)
+            args=(zip(list(self.camera_config.values())[3:], self.original_queues[3:]), self.rec_queue, self.ocr_queue, self.resource_queue, self.log_queue)
         )
 
         self.recognize_processes = Process(
             target=left_right_top_recognize_process,
-            args=(zip(self.original_queues[:3], self.result_queues[:3]),)
+            args=(zip(self.original_queues[:3], self.result_queues[:3]), self.log_queue,)
         )
 
         self.front_rear_capture = Process(
@@ -1008,17 +1058,12 @@ class MainWindow(QMainWindow):
             args=(zip(self.camera_config.values(), self.original_queues),)
         )
 
-        self.top_capture = Process(
-            target=top_capture_process,
-            args=(zip(self.camera_config.values(), self.original_queues),)
-        )
-
-        self.top_left_worker = Process(
+        self.top_rear_capture = Process(
             target=top_left_worker_process,
             args=(zip(list(self.camera_config.values())[:3], self.result_queues[:3]), self.ocr_queue, self.resource_queue)
         )
 
-        self.capture_processes = [RightLeftCaptureProcess(camera, original_queues, sleep_time=0.04) for
+        self.capture_processes = [RightLeftCaptureProcess(camera, original_queues, sleep_time=0.03) for
                                   camera, original_queues in
                                   zip(self.camera_config.values(), self.original_queues) if camera["direction"] in ["right", "left"]]
 
@@ -1038,13 +1083,11 @@ class MainWindow(QMainWindow):
 
         self.recognize_processes.start()
 
-        self.top_left_worker.start()
-
         time.sleep(5)
 
         self.front_rear_capture.start()
 
-        self.top_capture.start()
+        self.top_rear_capture.start()
 
         for capture in self.capture_processes:
             capture.start()
@@ -1091,9 +1134,96 @@ class MainWindow(QMainWindow):
             print("Error occurred while deleting old files:", e)
 
 
+def record_logging_data(log_path, queue):
+    print("log_path:", log_path, "type:", type(log_path))
+
+    # # 获取文件夹路径
+    # folder_path = os.path.dirname(log_path)
+    # # 如果文件夹不存在，创建文件夹
+    # if not os.path.exists(folder_path):
+    #     os.makedirs(folder_path)
+    #     print(f"文件夹 {folder_path} 已创建。")
+
+    # 打开并写入文件
+    with open(log_path, "w") as f:
+        f.write(str(log_path) + "\n")
+        while True:
+            if not queue.empty():
+                data = queue.get()
+                f.write(str(data) + "\n")
+                f.flush()
+            time.sleep(0.1)
+
+
+def compute_cpu_gpu_data(queue):
+    cpu_list = []
+    memory_list = []
+    gpu_usage_list = []
+    gpu_memory_list = []  # 新增用于存储 GPU 显存使用量
+
+    while True:
+        # 获取 CPU 利用率
+        cpu_usage = psutil.cpu_percent(interval=1)
+        cpu_list.append(cpu_usage)
+
+        # 获取内存利用率
+        memory_info = psutil.virtual_memory()
+        memory_usage = memory_info.percent
+        memory_list.append(memory_usage)
+
+        # 获取 GPU 利用率和显存使用情况
+        gpus = GPUtil.getGPUs()
+        for gpu in gpus:
+            gpu_usage = round(gpu.load * 100)  # GPU 使用率
+            gpu_memory = round(gpu.memoryUsed / gpu.memoryTotal * 100)  # 显存使用率百分比
+            gpu_usage_list.append(gpu_usage)
+            gpu_memory_list.append(gpu_memory)
+
+        if len(cpu_list) > 10:
+            cpu_max = round(max(cpu_list), 2)
+            memory_max = round(max(memory_list), 2)
+            gpu_max = round(max(gpu_usage_list), 2)
+            gpu_memory_max = round(max(gpu_memory_list), 2)
+
+            # 清空列表
+            cpu_list.clear()
+            memory_list.clear()
+            gpu_usage_list.clear()
+            gpu_memory_list.clear()
+
+            # 打印最大值
+            queue.put(f"cpu:{cpu_max},gpu:{gpu_max},显存:{gpu_memory_max},内存:{memory_max}%")
+
+
 if __name__ == "__main__":
     freeze_support()
     app = QApplication([])
-    main_window = MainWindow()
+    filed_name = str(sys.argv[1])
+    # filed_name = "102806"
+    # 使用示例
+    folder_name = now.strftime("%Y%m%d")
+    folder_filed = os.path.join(r"C:\Users\Install\Desktop\2024223\TianJinGangText", folder_name)
+    os.makedirs(folder_filed, exist_ok=True)
+    print(f"文件夹 '{folder_name}' 创建成功")
+
+    # log_path = os.path.join(folder_filed, f"{filed_name}.log")
+    log_path = os.path.join(folder_filed, f"{filed_name}.txt")
+    if os.path.exists(log_path):
+        os.remove(log_path)  # 删除文件
+
+    queue = Queue()
+
+    thread = threading.Thread(target=record_logging_data, args=(log_path, queue))
+    thread.daemon = True
+    thread.start()
+
+    process_compute = Process(
+        target=compute_cpu_gpu_data,
+        args=(queue,), )
+    process_compute.start()
+
+    main_window = MainWindow(filed_name, queue)
     main_window.show()
     app.exec()
+    thread.join()
+    process_compute.join()

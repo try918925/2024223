@@ -1,35 +1,40 @@
 {
     "params_left": {
-      "file_path": "C:/TianjinGangTest/22fps/202411111609/left.mp4",
+      "file_path": "D:/TianJinGangTest/202412031127/left.mp4",
       "roi": [400, 1300, 50, 950],
       "id": 0,
       "queue": "",
-      "direction": "left"
+      "direction": "left",
+      "sleep_time": 0.04
     },
     "params_right": {
-      "file_path": "C:/TianjinGangTest/22fps/202411111609/right.mp4",
+      "file_path": "D:/TianJinGangTest/202412031127/right.mp4",
       "roi": [400, 1300, 1650, 2550],
       "id": 2,
       "queue": "",
-      "direction": "right"
+      "direction": "right",
+      "sleep_time": 0.04
     },
     "params_top": {
-      "file_path":"C:/TianjinGangTest/22fps/202411111609/top.mp4",
+      "file_path":"D:/TianJinGangTest/202412031127/top.mp4",
       "roi":[250, 1350, 780,1880],
       "id": 1,
       "queue": "",
-      "direction": "top"
+      "direction": "top",
+      "sleep_time": 0.07
     },
      "params_front": {
-      "file_path": "C:/TianjinGangTest/22fps/202411111609/front.mp4",
+      "file_path": "D:/TianJinGangTest/202412031127/front.mp4",
       "roi": [450, 1440, 780, 1700],
       "id": 0,
-      "direction": "front"
+      "direction": "front",
+       "sleep_time": 0.07
     },
     "params_rear": {
-      "file_path": "C:/TianjinGangTest/22fps/202411111609/rear.mp4",
+      "file_path": "D:/TianJinGangTest/202412031127/rear.mp4",
       "roi": [520, 1425, 480, 1790],
       "id": 1,
-      "direction": "rear"
+      "direction": "rear",
+      "sleep_time": 0.07
     }
   }

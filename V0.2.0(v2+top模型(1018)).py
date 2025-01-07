@@ -1,4 +1,14 @@
-# -*- coding: utf-8 -*-
+# -*- coding:utf-8 -*-
+"""
+File    : V0.2.0(v2+top模型(1018))
+Date    : 2024-12-13
+IDE     : PyCharm
+Author  : pc2
+Env     : python3.10 or p38_t113_c118
+Version : V0.2.0(v2+top模型(1018))
+Note:   : 该版本读取数据流的方式:cudacodec,依赖于opencv的编译库，truck.engine编译生成
+"""
+
 import json
 import os
 os.add_dll_directory(r"C:/opencv-4.9.0/build/install/x64/vc16/bin")

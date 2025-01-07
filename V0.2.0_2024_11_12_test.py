@@ -4,8 +4,7 @@ import os, sys
 import threading
 import psutil
 import GPUtil
-
-os.add_dll_directory(r"C:/opencv_build_data/opencv-4.9.0/build/install/x64/vc16/bin")
+os.add_dll_directory(r"C:/opencv-4.9.0/build/install/x64/vc16/bin")
 os.add_dll_directory(r"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.8/bin")
 import cv2
 import ctypes
@@ -32,37 +31,37 @@ now = datetime.now()
 xiangti = ''
 
 
-def camera_model_data(filed_name):
+def camera_model_data(vedo_path):
     return {
         "params_left": {
-            "file_path": f"C:/test_veodie/22fps/{filed_name}/left.mp4",
+            "file_path": os.path.join(vedo_path, "left.mp4"),
             "roi": [400, 1300, 50, 950],
             "id": 0,
             "queue": "",
             "direction": "left"
         },
         "params_right": {
-            "file_path": f"C:/test_veodie/22fps/{filed_name}/right.mp4",
+            "file_path": os.path.join(vedo_path, "right.mp4"),
             "roi": [400, 1300, 1650, 2550],
             "id": 2,
             "queue": "",
             "direction": "right"
         },
         "params_top": {
-            "file_path": f"C:/test_veodie/22fps/{filed_name}/top.mp4",
+            "file_path": os.path.join(vedo_path, "top.mp4"),
             "roi": [250, 1350, 780, 1880],
             "id": 1,
             "queue": "",
             "direction": "top"
         },
         "params_front": {
-            "file_path": f"C:/test_veodie/22fps/{filed_name}/front.mp4",
+            "file_path": os.path.join(vedo_path, "front.mp4"),
             "roi": [450, 1440, 780, 1700],
             "id": 0,
             "direction": "front"
         },
         "params_rear": {
-            "file_path": f"C:/test_veodie/22fps/{filed_name}/rear.mp4",
+            "file_path": os.path.join(vedo_path, "rear.mp4"),
             "roi": [520, 1425, 480, 1790],
             "id": 1,
             "direction": "rear"
@@ -92,11 +91,9 @@ class ImageCaptureProcess(Process):
         decoder = cv2.cudacodec.createVideoReader(self.file_path)
         while True:
             if self.direction in self.left_right:
-                time.sleep(0.03)
+                time.sleep(0.042)
             else:
-                time.sleep(0.065)
-            if self.direction == "top":
-                break
+                time.sleep(0.075)
             ret, frame = decoder.nextFrame()
             if not ret or frame is None:
                 self.counter += 1
@@ -335,7 +332,7 @@ class ImageProcessWorker2(QThread):
 
     def initialize_inference(self):
         PLUGIN_LIBRARY = "./myplugins.dll"
-        engine_file_path = "truck_old.engine"
+        engine_file_path = "truck.engine"
         ctypes.CDLL(PLUGIN_LIBRARY)
         self.csd_detector = cont_trt_infer.CSD_Detector(engine_file_path)  # 初始化detector
         self.my_container_detect = cont_trt_infer.container_detect(self.csd_detector)
@@ -369,7 +366,8 @@ class ImageProcessWorker2(QThread):
                 if reuslt_dict:
                     res_dict_lst.append(reuslt_dict)
                 self.mean_data.append(time.time() - start_time)
-                if self.my_container_detect.non_truck > 8 and self.my_container_detect.new_truck:
+                # if self.my_container_detect.non_truck > 10 and self.my_container_detect.new_truck:
+                if self.my_container_detect.non_truck > 85 and self.my_container_detect.new_truck:
                     print(f"{self.direction}:ImageProcessWorker2:队列长度为:{self.queue.qsize()}")
                     self.log_queue.put(f"{self.direction}:ImageProcessWorker2:队列长度为:{self.queue.qsize()}")
                     print(f"{self.direction}:ImageProcessWorker2有车来:{time.time() - start_time}")
@@ -670,14 +668,14 @@ class RecThread(QThread):
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, filed_name, log_queue):
+    def __init__(self, vedo_path, log_queue):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.labels1 = [self.ui.label, self.ui.label_2, self.ui.label_3]
         self.labels2 = [self.ui.label_4, self.ui.label_5]
         self.labels = [self.ui.label_7, self.ui.label_8, self.ui.label_9]
-        self.camera_config = camera_model_data(filed_name)
+        self.camera_config = camera_model_data(vedo_path)
 
         self.log_queue = log_queue
         self.ocr_queue = Queue()
@@ -871,10 +869,14 @@ def compute_cpu_gpu_data(queue):
 if __name__ == "__main__":
     freeze_support()
     app = QApplication([])
-    filed_name = str(sys.argv[1])
+    dir_name = r"D:\TianJinGangTest\22fps_crop"
+    # dir_name = str(sys.argv[1])
+    filed_name = "202411111538"
+    # filed_name = str(sys.argv[2])
     # 使用示例
     folder_name = now.strftime("%Y%m%d")
-    folder_filed = os.path.join(r"C:\Users\Install\Desktop\2024223\TianJinGangText", folder_name)
+    TianJinGangText_path = os.path.join(os.path.dirname(dir_name), "TianJinGang_Data")
+    folder_filed = os.path.join(TianJinGangText_path, folder_name)
     os.makedirs(folder_filed, exist_ok=True)
     print(f"文件夹 '{folder_name}' 创建成功")
 
@@ -893,7 +895,8 @@ if __name__ == "__main__":
         args=(queue,), )
     process_compute.start()
 
-    main_window = MainWindow(filed_name, queue)
+    vedo_path = os.path.join(dir_name, filed_name)
+    main_window = MainWindow(vedo_path, queue)
     main_window.show()
     app.exec()
     record_process.join()

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 from multiprocessing import Process
+
 os.add_dll_directory(r"C:/opencv-4.9.0/build/install/x64/vc16/bin")
 os.add_dll_directory(r"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.8/bin")
 import cv2
@@ -375,6 +376,3 @@ if __name__ == '__main__':
                 print("完成一个片段的截取:", start_time, end_time)
                 check_and_remove(output_video_path)
                 time.sleep(10)
-    else:
-        print("时间序列长度不够，无法进行视频截取！", time_quantum_lenght)
-    print("所有片段的截取完成！")

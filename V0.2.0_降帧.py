@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
 import os
-
 os.add_dll_directory(r"C:/opencv-4.9.0/build/install/x64/vc16/bin")
 os.add_dll_directory(r"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.8/bin")
 import cv2
@@ -11,7 +10,6 @@ from PySide6.QtWidgets import *
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from uuu import Ui_MainWindow
-import threading
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Queue, Process, freeze_support
 import test_infer as trt_infer
@@ -20,7 +18,6 @@ import infer_det_rec_car as det_ocr_car
 import stichImg as ts
 from algorithms.detector import YOLOv5Detector
 import Container_det as cont_trt_infer
-# import Container_det_trt_yolov5 as cont_trt_infer
 import time, glob, socket, zmq
 from datetime import datetime
 from configs import config_5s_trt as my_config
@@ -589,7 +586,7 @@ class MainWindow(QMainWindow):
         self.rec_thread = RecThread(self.rec_queue)
         self.rec_thread.recMessage.connect(self.update_rec)
 
-        self.path = "result"
+        self.path = "1108_save_test"
         self.channel = "01"
         self.save_thread = SaveProcessWorker(self.path, self.channel)
 
